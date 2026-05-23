@@ -1,0 +1,74 @@
+// ============================================================
+//  Bootstrap Theme Overrides — CCI20/SMA20 Stock Screener
+//  Dark financial dashboard palette
+// ============================================================
+
+// ── Colour palette ─────────────────────────────────────────
+$primary:              #6366f1;   // Indigo
+$secondary:            #64748b;   // Slate
+$success:              #10b981;   // Emerald
+$info:                 #38bdf8;   // Sky
+$warning:              #f59e0b;   // Amber
+$danger:               #ef4444;   // Red
+$light:                #e2e8f0;
+$dark:                 #0f172a;
+
+// ── Body / Layout ──────────────────────────────────────────
+$body-bg:              #0f172a;
+$body-color:           #e2e8f0;
+$body-emphasis-color:  #f8fafc;
+
+// ── Typography ─────────────────────────────────────────────
+$font-family-sans-serif: 'Inter', system-ui, -apple-system, sans-serif;
+$font-size-base:         0.9375rem;  // 15px
+$line-height-base:       1.6;
+
+$headings-font-weight:   700;
+$headings-color:         #f8fafc;
+
+// ── Border radius ──────────────────────────────────────────
+$border-radius:          0.5rem;
+$border-radius-sm:       0.375rem;
+$border-radius-lg:       0.75rem;
+$border-radius-xl:       1rem;
+$border-radius-pill:     50rem;
+
+// ── Cards ──────────────────────────────────────────────────
+$card-bg:               rgba(30, 41, 59, 0.6);
+$card-border-color:     rgba(255, 255, 255, 0.08);
+$card-border-radius:    $border-radius-xl;
+$card-spacer-x:         1.5rem;
+$card-spacer-y:         1.5rem;
+
+// ── Tables ─────────────────────────────────────────────────
+$table-color:            $body-color;
+$table-bg:               transparent;
+$table-border-color:     rgba(255, 255, 255, 0.07);
+$table-striped-bg:       rgba(255, 255, 255, 0.025);
+$table-hover-bg:         rgba(255, 255, 255, 0.045);
+$table-th-font-weight:   600;
+
+// ── Badges ─────────────────────────────────────────────────
+$badge-font-size:        0.72em;
+$badge-font-weight:      600;
+$badge-border-radius:    $border-radius-pill;
+$badge-padding-x:        0.65em;
+$badge-padding-y:        0.35em;
+
+// ── Buttons ────────────────────────────────────────────────
+$btn-border-radius:      $border-radius-lg;
+$btn-font-weight:        500;
+
+// ── Navbar ─────────────────────────────────────────────────
+$navbar-dark-color:          rgba(255,255,255,0.75);
+$navbar-dark-active-color:   #fff;
+
+// ── Grid breakpoints (unchanged, just explicit) ─────────────
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);

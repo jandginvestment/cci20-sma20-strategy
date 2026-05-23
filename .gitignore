@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.venv311/
+*.egg-info/
+dist/
+.Python
+
+# Node / Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.sass-cache/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+.qodo/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+build_error.txt
+
+# PowerShell helpers (local only)
+*.ps1

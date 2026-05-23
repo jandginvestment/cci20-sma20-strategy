@@ -1,0 +1,50 @@
+name: Scan Stocks
+
+on:
+  schedule:
+    # 05:00 UTC = 10:30 AM IST (NSE market open)
+    - cron: '0 5 * * 1-5'
+    # 10:30 UTC = 4:00 PM IST (NSE market close)
+    - cron: '30 10 * * 1-5'
+  workflow_dispatch:   # allow manual trigger from GitHub Actions tab
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run scanner
+        run: |
+          python backend/scanner.py \
+            --watchlists backend/watchlists \
+            --output frontend/src/assets/data
+
+      - name: Commit updated scan results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/src/assets/data/
+          git diff --cached --quiet || git commit -m "chore: update scan results [skip ci]"
+          git push

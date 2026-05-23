@@ -1,0 +1,40 @@
+// ============================================================
+//  Global entry-point for the Stock Screener Dashboard
+//  Order matters:
+//   1. Google Font import
+//   2. Our variable overrides (BEFORE Bootstrap)
+//   3. Bootstrap core
+//   4. Our custom utilities / component helpers
+// ============================================================
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+// 1. Override Bootstrap defaults with our dark financial palette
+@import 'styles/variables';
+
+// 2. Bootstrap required (functions, variables, mixins, utilities)
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/variables-dark';
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/utilities';
+
+// 3. Bootstrap optional components — import only what we need
+@import 'bootstrap/scss/root';
+@import 'bootstrap/scss/reboot';
+@import 'bootstrap/scss/type';
+@import 'bootstrap/scss/grid';
+@import 'bootstrap/scss/tables';
+@import 'bootstrap/scss/buttons';
+@import 'bootstrap/scss/badge';
+@import 'bootstrap/scss/card';
+@import 'bootstrap/scss/spinners';
+@import 'bootstrap/scss/nav';
+@import 'bootstrap/scss/navbar';
+@import 'bootstrap/scss/transitions';
+@import 'bootstrap/scss/helpers';
+@import 'bootstrap/scss/utilities/api';
+
+// 4. Our custom overrides and component styles
+@import 'styles/custom';

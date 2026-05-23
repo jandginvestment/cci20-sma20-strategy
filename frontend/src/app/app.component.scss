@@ -1,0 +1,416 @@
+// app.component.scss
+// Per-component styles — uses only self-contained values
+// Bootstrap classes handle layout/typography via global styles.scss
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #0f172a;
+}
+
+// ── Dashboard wrapper ─────────────────────────────────────
+.dashboard-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+// ── Header ───────────────────────────────────────────────
+.dashboard-header {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 2.5rem;
+  animation: slideDown 0.55s ease-out both;
+
+  .subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 0;
+  }
+}
+
+// ── Stat value text ────────────────────────────────────────
+.stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin-top: 0.25rem;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 500;
+  margin: 0;
+}
+
+// ── Table wrapper ─────────────────────────────────────────
+.table-wrapper {
+  border-radius: 1rem;
+  overflow: hidden;
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  animation: fadeInUp 0.65s ease-out both;
+}
+
+// ── Dist % column ─────────────────────────────────────────
+.dist-cell {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+// ── Loading overlay ───────────────────────────────────────
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  color: #64748b;
+  gap: 1rem;
+}
+
+// ── Error state ───────────────────────────────────────────
+.error-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  color: #64748b;
+  gap: 0.75rem;
+}
+
+// ── Keyframes (scoped to component) ──────────────────────
+@keyframes slideDown  { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeInUp   { from { opacity:0; transform:translateY(12px);  } to { opacity:1; transform:translateY(0); } }
+
+// ── Filter Cards ──────────────────────────────────────────
+.filter-card {
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease !important;
+
+  &:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  &:active {
+    transform: translateY(-2px) !important;
+  }
+
+  // ── Active states per filter type ─────────────────────
+  &.card-active {
+    box-shadow: 0 0 0 2px currentColor, 0 12px 32px rgba(0,0,0,0.25) !important;
+  }
+
+  &.card-filter-all {
+    border-color: rgba(99, 102, 241, 0.65) !important; // indigo
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5), 0 8px 24px rgba(99,102,241,0.15) !important;
+  }
+
+  &.card-filter-year {
+    border-color: rgba(239, 68, 68, 0.65) !important;  // red
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5), 0 8px 24px rgba(239,68,68,0.15) !important;
+  }
+
+  &.card-filter-month {
+    border-color: rgba(245, 158, 11, 0.65) !important; // amber
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.5), 0 8px 24px rgba(245,158,11,0.15) !important;
+  }
+
+  &.card-filter-week {
+    border-color: rgba(16, 185, 129, 0.65) !important; // emerald
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5), 0 8px 24px rgba(16,185,129,0.15) !important;
+  }
+}
+
+// ── Active dot indicator ──────────────────────────────────
+.active-dot {
+  width:  8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.4); }
+}
+
+// ── Filter label pill ─────────────────────────────────────
+.filter-pill {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           6px;
+  padding:       0.28rem 0.75rem;
+  border-radius: 50rem;
+  font-size:     0.78rem;
+  font-weight:   600;
+  letter-spacing: 0.02em;
+  animation:     fadeInUp 0.3s ease-out both;
+
+  &.pill-all   { background: rgba(99,102,241,0.18);  color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3);  }
+  &.pill-year  { background: rgba(239,68,68,0.18);   color: #fca5a5; border: 1px solid rgba(239,68,68,0.3);   }
+  &.pill-month { background: rgba(245,158,11,0.18);  color: #fcd34d; border: 1px solid rgba(245,158,11,0.3);  }
+  &.pill-week  { background: rgba(16,185,129,0.18);  color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3);  }
+}
+
+.pill-clear {
+  background:    none;
+  border:        1px solid rgba(255,255,255,0.12);
+  color:         #94a3b8;
+  border-radius: 50%;
+  width:         22px;
+  height:        22px;
+  font-size:     0.7rem;
+  line-height:   1;
+  padding:       0;
+  cursor:        pointer;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  transition:    all 0.18s ease;
+
+  &:hover { background: rgba(255,255,255,0.08); color: #e2e8f0; }
+}
+
+// ── Row highlights for filtered context ──────────────────
+.row-highlight-year {
+  background: rgba(239, 68, 68, 0.06) !important;
+  border-left: 3px solid rgba(239, 68, 68, 0.5);
+}
+
+.row-highlight-month {
+  background: rgba(245, 158, 11, 0.05) !important;
+  border-left: 3px solid rgba(245, 158, 11, 0.4);
+}
+
+// ── Row number column ─────────────────────────────────────
+.row-num {
+  font-size: 0.78rem;
+  width: 36px;
+  min-width: 36px;
+}
+
+// ── Ticker Links ──────────────────────────────────────────
+.ticker-link {
+  color: #f8fafc;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+
+  .tv-icon {
+    opacity: 0;
+    color: #60a5fa;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translate(-4px, 4px);
+  }
+
+  &:hover {
+    color: #60a5fa;
+
+    .tv-icon {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+  }
+}
+
+// ── Sortable column headers ────────────────────────────────
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.18s ease, background 0.18s ease;
+
+  &:hover {
+    color: #e2e8f0 !important;
+    background: rgba(255,255,255,0.05) !important;
+  }
+}
+
+.th-active {
+  color: #a5b4fc !important;            // indigo highlight on active sort col
+  background: rgba(99,102,241,0.08) !important;
+}
+
+.th-combo {
+  color: #fcd34d;                        // amber for the signal column
+  white-space: nowrap;
+}
+
+.th-signal-col {
+  border-right: 1px dashed rgba(255,255,255,0.07);
+}
+
+.th-num { width: 36px; min-width: 36px; }
+
+// Sort direction arrows via pseudo-content
+.sort-icon {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 0.7em;
+  opacity: 0.4;
+  vertical-align: middle;
+  transition: opacity 0.18s ease;
+
+  &.sort-none::after  { content: '⇅'; }
+  &.sort-asc::after   { content: '↑'; opacity: 1; color: #a5b4fc; }
+  &.sort-desc::after  { content: '↓'; opacity: 1; color: #a5b4fc; }
+}
+
+.th-active .sort-icon { opacity: 1; }
+
+// ── CCI four-zone colouring ───────────────────────────────
+.cci-cell { font-variant-numeric: tabular-nums; position: relative; }
+
+.cci-oversold  { color: #f87171; font-weight: 700; }   // deep red  — CCI < -100
+.cci-neg       { color: #fca5a5; }                      // light red — CCI -100→0
+.cci-pos       { color: #86efac; }                      // light green — CCI 0-100
+.cci-overbought { color: #34d399; font-weight: 700; }   // deep green — CCI > 100
+
+// ── SMA above/below indicator ─────────────────────────────
+.sma-cell { font-variant-numeric: tabular-nums; }
+
+.sma-rel {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 0.7em;
+  font-weight: 700;
+  vertical-align: middle;
+
+  &.above-sma { color: #4ade80; }
+  &.below-sma { color: #f87171; }
+}
+
+// ── CCI + SMA Signal badge ────────────────────────────────
+.signal-cell { white-space: nowrap; }
+
+.signal-badge {
+  display: inline-block;
+  padding: 0.22rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: default;
+  transition: box-shadow 0.2s ease;
+
+  &:hover { box-shadow: 0 0 0 2px currentColor; }
+
+  // Reversal Zone — CCI < -100 & below SMA (most important setup)
+  &.sig-reversal {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.45);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.15);
+  }
+
+  // Recovery — CCI -100→0 & above SMA
+  &.sig-recovery {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fcd34d;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+  }
+
+  // Bullish Setup — CCI 0-100 & above SMA
+  &.sig-momentum {
+    background: rgba(16, 185, 129, 0.18);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+  }
+
+  // Overbought — CCI > 100 & above SMA
+  &.sig-overbought {
+    background: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    border: 1px solid rgba(139, 92, 246, 0.4);
+  }
+
+  // Neutral
+  &.sig-neutral {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+  }
+}
+
+// ── Row-level signal tints ────────────────────────────────
+// These are subtle left-border + very faint bg so the table stays readable
+.row-sig-reversal {
+  border-left: 3px solid rgba(239, 68, 68, 0.55) !important;
+  background: rgba(239, 68, 68, 0.04) !important;
+}
+
+.row-sig-recovery {
+  border-left: 3px solid rgba(245, 158, 11, 0.45) !important;
+  background: rgba(245, 158, 11, 0.03) !important;
+}
+
+.row-sig-momentum {
+  border-left: 3px solid rgba(16, 185, 129, 0.4) !important;
+  background: rgba(16, 185, 129, 0.03) !important;
+}
+
+.row-sig-overbought {
+  border-left: 3px solid rgba(139, 92, 246, 0.4) !important;
+  background: rgba(139, 92, 246, 0.03) !important;
+}
+
+// Year-low rows get a stronger background but keep signal border
+.row-highlight-year.row-sig-reversal {
+  background: rgba(239, 68, 68, 0.09) !important;
+}
+
+// ── Signal legend strip ───────────────────────────────────
+.signal-legend {
+  margin-bottom: 0.5rem;
+
+  .legend-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+}
+
+.sig-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  &.chip-active {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4), 0 4px 14px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+  }
+
+  &.sig-reversal  { background: rgba(239,68,68,0.18);   color: #fca5a5; border: 1px solid rgba(239,68,68,0.3);   }
+  &.sig-recovery  { background: rgba(245,158,11,0.18);  color: #fcd34d; border: 1px solid rgba(245,158,11,0.3);  }
+  &.sig-momentum  { background: rgba(16,185,129,0.18);  color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3);  }
+  &.sig-overbought { background: rgba(139,92,246,0.18); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.3);  }
+}
+

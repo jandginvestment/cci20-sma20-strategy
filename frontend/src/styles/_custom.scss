@@ -1,0 +1,140 @@
+// ============================================================
+//  Custom utility extensions on top of Bootstrap
+// ============================================================
+
+// ── Glassmorphism Card ─────────────────────────────────────
+.card-glass {
+  background:    rgba(30, 41, 59, 0.55) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border:        1px solid rgba(255, 255, 255, 0.08) !important;
+  transition:    transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform:   translateY(-4px);
+    box-shadow:  0 16px 40px rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+}
+
+// ── Gradient logo box ──────────────────────────────────────
+.logo-box {
+  background:    linear-gradient(135deg, $primary, #8b5cf6);
+  width:         50px;
+  height:        50px;
+  border-radius: $border-radius-lg;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  color:         white;
+  box-shadow:    0 4px 15px rgba(139, 92, 246, 0.35);
+  flex-shrink:   0;
+}
+
+// ── Stat icon circles ──────────────────────────────────────
+.stat-icon {
+  width:  52px;
+  height: 52px;
+  border-radius: 50%;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  flex-shrink:   0;
+
+  &.trend-up  { color: $success; background: rgba($success, 0.12); }
+  &.trend-dn  { color: $danger;  background: rgba($danger,  0.12); }
+  &.neutral   { color: $info;    background: rgba($info,    0.12); }
+  &.highlight { color: $danger;  background: rgba($danger,  0.12); }
+  &.default   { color: $primary; background: rgba($primary, 0.12); }
+}
+
+// ── Distance progress-bar ──────────────────────────────────
+.prog-wrap {
+  height:        4px;
+  background:    rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow:      hidden;
+  margin-bottom: 4px;
+
+  .prog-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition:  width 0.6s ease;
+  }
+  .prog-fill.safe   { background: $primary; }
+  .prog-fill.warn   { background: $warning; }
+  .prog-fill.danger { background: $danger;  }
+}
+
+// ── Badge colour helpers ───────────────────────────────────
+.badge-yr  { background: rgba($danger,   0.18); color: lighten($danger,   20%);  border: 1px solid rgba($danger,  0.3); }
+.badge-mo  { background: rgba($warning,  0.18); color: lighten($warning,  15%); border: 1px solid rgba($warning, 0.3); }
+.badge-wk  { background: rgba($primary,  0.18); color: lighten($primary,  25%); border: 1px solid rgba($primary, 0.3); }
+
+// ── Table tweaks ──────────────────────────────────────────
+.scanner-table {
+  font-size: 0.875rem;
+
+  thead th {
+    background:     rgba(0,0,0,0.3);
+    position:       sticky;
+    top:            0;
+    z-index:        10;
+    white-space:    nowrap;
+    text-transform: uppercase;
+    font-size:      0.78rem;
+    letter-spacing: 0.04em;
+    color:          $secondary;
+    border-bottom:  1px solid rgba(255,255,255,0.08);
+  }
+
+  tbody tr {
+    transition: background 0.18s ease;
+  }
+
+  .col-ticker { font-weight: 600; letter-spacing: 0.06em; color: #f8fafc; }
+  .col-price  { font-variant-numeric: tabular-nums; }
+  .cci-pos    { color: $success; }
+  .cci-neg    { color: $danger;  }
+}
+
+// ── Refresh button ─────────────────────────────────────────
+.btn-refresh {
+  display:       flex;
+  align-items:   center;
+  gap:           8px;
+  font-size:     0.875rem;
+  border-radius: $border-radius-lg;
+  border:        1px solid rgba(255,255,255,0.12);
+  color:         $light;
+  background:    rgba(255,255,255,0.05);
+  transition:    all 0.2s ease;
+
+  &:hover { background: rgba(255,255,255,0.1); color: #fff; transform: translateY(-1px); }
+  &:active { transform: translateY(1px); }
+}
+
+// ── Spinner override ───────────────────────────────────────
+.spinner-custom {
+  width:        40px;
+  height:       40px;
+  border:       4px solid rgba($primary, 0.15);
+  border-left-color: $primary;
+  border-radius: 50%;
+  animation:    spin 0.9s linear infinite;
+}
+
+// ── Keyframes ─────────────────────────────────────────────
+@keyframes spin       { to { transform: rotate(360deg); } }
+@keyframes slideDown  { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeInUp   { from { opacity:0; transform:translateY(12px);  } to { opacity:1; transform:translateY(0); } }
+
+// animation utilities
+.anim-slide-down  { animation: slideDown  0.55s ease-out both; }
+.anim-fade-in-up  { animation: fadeInUp   0.65s ease-out both; }
+
+// ── Scrollbar (Webkit) ────────────────────────────────────
+::-webkit-scrollbar        { width:8px; height:8px; }
+::-webkit-scrollbar-track  { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.12); border-radius:4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
