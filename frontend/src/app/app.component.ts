@@ -66,7 +66,7 @@ export class AppComponent implements OnInit {
     this.loading = true;
     try {
       const cacheBuster = `?t=${new Date().getTime()}`;
-      const response = await fetch('/assets/data/watchlists.json' + cacheBuster);
+      const response = await fetch('assets/data/watchlists.json' + cacheBuster);
       if (!response.ok) throw new Error('Could not fetch watchlists.json');
       this.watchlists = await response.json();
       if (this.watchlists.length > 0) {
@@ -87,7 +87,7 @@ export class AppComponent implements OnInit {
     this.error = '';
     try {
       const cacheBuster = `?t=${new Date().getTime()}`;
-      const response = await fetch('/assets/data/' + wl.file + cacheBuster);
+      const response = await fetch('assets/data/' + wl.file + cacheBuster);
       if (!response.ok) throw new Error('Could not fetch ' + wl.file);
       const csvText = await response.text();
       this.parseCSV(csvText);
