@@ -105,14 +105,40 @@ def process_watchlist(watchlist_path, collection):
     print(f"Saved {len(results)} results for '{watchlist_name}' to Couchbase")
     return watchlist_name
 
+def purge_existing(cluster, collection):
+    """Delete all scan documents before inserting fresh data."""
+    from couchbase.exceptions import DocumentNotFoundException
+    try:
+        result = cluster.query(
+            "SELECT META().id AS doc_id FROM `scan-results`._default._default "
+            "WHERE META().id LIKE 'results::%' OR META().id = 'index::watchlists'"
+        )
+        ids = [row['doc_id'] for row in result]
+        for doc_id in ids:
+            try:
+                collection.remove(doc_id)
+            except DocumentNotFoundException:
+                pass
+        print(f"Purged {len(ids)} existing documents from Couchbase")
+    except Exception as e:
+        print(f"Warning: purge step failed ({e}), proceeding with upsert")
+
 def run_scanner(watchlists_dir):
     if not os.path.isdir(watchlists_dir):
         print(f"Error: {watchlists_dir} is not a valid directory.")
         return
 
-    collection = get_cb_collection()
-    watchlist_names = []
+    from couchbase.cluster import Cluster
+    from couchbase.options import ClusterOptions
+    from couchbase.auth import PasswordAuthenticator
+    auth = PasswordAuthenticator(os.environ['CB_USERNAME'], os.environ['CB_PASSWORD'])
+    cluster = Cluster(os.environ['CB_CONN_STR'], ClusterOptions(auth))
+    cluster.wait_until_ready(timedelta(seconds=10))
+    collection = cluster.bucket('scan-results').default_collection()
 
+    purge_existing(cluster, collection)
+
+    watchlist_names = []
     for filename in os.listdir(watchlists_dir):
         if filename.endswith('.csv'):
             name = process_watchlist(os.path.join(watchlists_dir, filename), collection)
