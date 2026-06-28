@@ -1,7 +1,9 @@
 import os
+import math
 from datetime import timedelta
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import ORJSONResponse
 from couchbase.cluster import Cluster
 from couchbase.options import ClusterOptions
 from couchbase.auth import PasswordAuthenticator
@@ -18,7 +20,7 @@ def get_collection():
         _collection = cluster.bucket('scan-results').default_collection()
     return _collection
 
-app = FastAPI(title="CCI/SMA Scanner API")
+app = FastAPI(title="CCI/SMA Scanner API", default_response_class=ORJSONResponse)
 
 app.add_middleware(
     CORSMiddleware,

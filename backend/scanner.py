@@ -60,6 +60,10 @@ def process_watchlist(watchlist_path, collection):
             cci_20      = float(df['CCI_20'].iloc[-1])
             sma_20      = float(df['SMA_20'].iloc[-1])
 
+            # Skip if any key metric is NaN (insufficient data)
+            if any(np.isnan(v) for v in [latest_price, cci_20, sma_20]):
+                continue
+
             yearly_low  = float(df['Low'].rolling(window=252).min().iloc[-1])
             monthly_low = float(df['Low'].rolling(window=21).min().iloc[-1])
             weekly_low  = float(df['Low'].rolling(window=5).min().iloc[-1])
