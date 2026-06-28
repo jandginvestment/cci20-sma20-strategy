@@ -23,12 +23,12 @@
         <li class="nav-item" *ngFor="let wl of watchlists">
           <a class="nav-link py-2 px-3 rounded d-flex align-items-center justify-content-between"
              style="cursor: pointer; transition: all 0.2s;"
-             [class.bg-primary]="activeWatchlist?.file === wl.file"
-             [class.text-white]="activeWatchlist?.file === wl.file"
-             [class.text-secondary]="activeWatchlist?.file !== wl.file"
+             [class.bg-primary]="activeWatchlist?.name === wl.name"
+             [class.text-white]="activeWatchlist?.name === wl.name"
+             [class.text-secondary]="activeWatchlist?.name !== wl.name"
              (click)="loadWatchlist(wl)">
             <span class="text-truncate">{{ wl.name }}</span>
-            <svg *ngIf="activeWatchlist?.file === wl.file" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+            <svg *ngIf="activeWatchlist?.name === wl.name" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" stroke-linejoin="round">
               <polyline points="9 18 15 12 9 6"></polyline>
