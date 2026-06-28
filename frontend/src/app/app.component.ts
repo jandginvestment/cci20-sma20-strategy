@@ -1,18 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 
-const CB_API   = 'https://gzm7xppvcnfbckri.data.cloud.couchbase.com';
-const CB_BUCKET = 'scan-results';
-// Use a read-only account (angular-reader) — visible in browser but read-only is safe for public data
-const CB_USER  = 'angular-reader';
-const CB_PASS  = 'z-q1JV^E5Z4G';
-
-function cbUrl(key: string): string {
-  return `${CB_API}/v1/buckets/${CB_BUCKET}/scopes/_default/collections/_default/documents/${encodeURIComponent(key)}`;
-}
-function cbAuth(): string {
-  return 'Basic ' + btoa(`${CB_USER}:${CB_PASS}`);
-}
+const API_URL = 'https://cci20-sma20-api-production.up.railway.app';
 
 export interface ScanResult {
   Ticker: string;
@@ -74,19 +63,16 @@ export class AppComponent implements OnInit {
 
   ngOnInit() { this.fetchWatchlists(); }
 
-  private async cbFetch(key: string): Promise<any> {
-    const response = await fetch(cbUrl(key), {
-      headers: { 'Authorization': cbAuth() }
-    });
-    if (!response.ok) throw new Error(`Couchbase fetch failed (${response.status}) for key: ${key}`);
+  private async apiFetch(path: string): Promise<any> {
+    const response = await fetch(`${API_URL}${path}`);
+    if (!response.ok) throw new Error(`API error (${response.status}): ${path}`);
     return response.json();
   }
 
   async fetchWatchlists() {
     this.loading = true;
     try {
-      const doc = await this.cbFetch('index::watchlists');
-      this.watchlists = doc.watchlists ?? [];
+      this.watchlists = await this.apiFetch('/watchlists');
       if (this.watchlists.length > 0) {
         this.loadWatchlist(this.watchlists[0]);
       } else {
@@ -104,7 +90,7 @@ export class AppComponent implements OnInit {
     this.loading = true;
     this.error = '';
     try {
-      const doc = await this.cbFetch(`results::${wl.name}`);
+      const doc = await this.apiFetch(`/results/${wl.name}`);
       this.results = (doc.results ?? []).map((r: any) => ({
         ...r,
         sparkline: this.generateSparkline(r.CCI_History ?? [])
