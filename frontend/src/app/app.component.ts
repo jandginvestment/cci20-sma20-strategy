@@ -1,6 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 
+const CB_API   = 'https://gzm7xppvcnfbckri.data.cloud.couchbase.com';
+const CB_BUCKET = 'scan-results';
+// Use a read-only account (angular-reader) — visible in browser but read-only is safe for public data
+const CB_USER  = 'angular-reader';
+const CB_PASS  = 'z-q1JV^E5Z4G';
+
+function cbUrl(key: string): string {
+  return `${CB_API}/v1/buckets/${CB_BUCKET}/scopes/_default/collections/_default/documents/${encodeURIComponent(key)}`;
+}
+function cbAuth(): string {
+  return 'Basic ' + btoa(`${CB_USER}:${CB_PASS}`);
+}
+
 export interface ScanResult {
   Ticker: string;
   Close: number;
@@ -30,7 +43,6 @@ export interface Signal {
 
 export interface Watchlist {
   name: string;
-  file: string;
 }
 
 @Component({
@@ -62,13 +74,19 @@ export class AppComponent implements OnInit {
 
   ngOnInit() { this.fetchWatchlists(); }
 
+  private async cbFetch(key: string): Promise<any> {
+    const response = await fetch(cbUrl(key), {
+      headers: { 'Authorization': cbAuth() }
+    });
+    if (!response.ok) throw new Error(`Couchbase fetch failed (${response.status}) for key: ${key}`);
+    return response.json();
+  }
+
   async fetchWatchlists() {
     this.loading = true;
     try {
-      const cacheBuster = `?t=${new Date().getTime()}`;
-      const response = await fetch('assets/data/watchlists.json' + cacheBuster);
-      if (!response.ok) throw new Error('Could not fetch watchlists.json');
-      this.watchlists = await response.json();
+      const doc = await this.cbFetch('index::watchlists');
+      this.watchlists = doc.watchlists ?? [];
       if (this.watchlists.length > 0) {
         this.loadWatchlist(this.watchlists[0]);
       } else {
@@ -86,49 +104,17 @@ export class AppComponent implements OnInit {
     this.loading = true;
     this.error = '';
     try {
-      const cacheBuster = `?t=${new Date().getTime()}`;
-      const response = await fetch('assets/data/' + wl.file + cacheBuster);
-      if (!response.ok) throw new Error('Could not fetch ' + wl.file);
-      const csvText = await response.text();
-      this.parseCSV(csvText);
-      this.lastUpdated = new Date();
+      const doc = await this.cbFetch(`results::${wl.name}`);
+      this.results = (doc.results ?? []).map((r: any) => ({
+        ...r,
+        sparkline: this.generateSparkline(r.CCI_History ?? [])
+      }));
+      this.lastUpdated = doc.scanned_at ? new Date(doc.scanned_at) : new Date();
       this.loading = false;
     } catch (e: any) {
       this.error = e.message;
       this.loading = false;
     }
-  }
-
-  parseCSV(csv: string) {
-    const lines = csv.split('\n').filter(l => l.trim() !== '');
-    if (lines.length < 2) return;
-    const data: ScanResult[] = [];
-    for (let i = 1; i < lines.length; i++) {
-      const row = lines[i].split(',');
-      if (row.length < 13) continue;
-      const scanObj: any = {
-        Ticker: row[0],
-        Close: parseFloat(row[1]),
-        CCI_20: parseFloat(row[2]),
-        SMA_20: parseFloat(row[3]),
-        Yearly_Low: parseFloat(row[4]),
-        Monthly_Low: parseFloat(row[5]),
-        Weekly_Low: parseFloat(row[6]),
-        Pct_From_Y_Low: parseFloat(row[7]),
-        Pct_From_M_Low: parseFloat(row[8]),
-        Pct_From_W_Low: parseFloat(row[9]),
-        Near_Y_Low: row[10].trim() === 'True',
-        Near_M_Low: row[11].trim() === 'True',
-        Near_W_Low: row[12].trim() === 'True',
-      };
-      
-      const history = (row[13] || '').split('|').map(v => parseFloat(v)).filter(v => !isNaN(v));
-      scanObj.CCI_History = history;
-      scanObj.sparkline = this.generateSparkline(history);
-      
-      data.push(scanObj as ScanResult);
-    }
-    this.results = data;
   }
 
   generateSparkline(values: number[]): { path: string, zero: string } {
@@ -254,13 +240,13 @@ export class AppComponent implements OnInit {
 
   // ── Actions ────────────────────────────────────────────
   openTradingView(ticker: string) {
-    let tvSymbol = ticker;
+    let tvSymbol: string;
     if (ticker.endsWith('.NS')) {
       tvSymbol = 'NSE:' + ticker.replace('.NS', '');
     } else if (ticker.endsWith('.BO')) {
       tvSymbol = 'BSE:' + ticker.replace('.BO', '');
     } else {
-      tvSymbol = 'NSE:' + ticker; // fallback
+      tvSymbol = 'NSE:' + ticker;
     }
     const encodedSymbol = encodeURIComponent(tvSymbol);
     const url = `https://www.tradingview.com/chart/b7xSVbGi/?symbol=${encodedSymbol}`;
