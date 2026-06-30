@@ -67,5 +67,7 @@ def trigger_scan(background_tasks: BackgroundTasks):
     return {"status": "scan started"}
 
 def run_scan(watchlists_dir: str):
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
     from scanner import run_scanner
     run_scanner(watchlists_dir)
