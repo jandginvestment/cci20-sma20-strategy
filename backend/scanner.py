@@ -39,12 +39,13 @@ def process_watchlist(watchlist_path, collection):
             ticker_symbol += '.NS'
 
         try:
-            df = yf.download(ticker_symbol, period="2y", interval="1d", progress=False)
+            df = yf.download(ticker_symbol, period="2y", interval="1d", progress=False, auto_adjust=True)
 
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.droplevel(1)
 
             if df.empty or len(df) < 252:
+                print(f"  SKIP {ticker_symbol}: rows={len(df)} (need 252+)")
                 continue
 
             df['SMA_20'] = df['Close'].rolling(window=20).mean()
@@ -95,7 +96,7 @@ def process_watchlist(watchlist_path, collection):
             })
 
         except Exception as e:
-            pass
+            print(f"  ERROR {ticker_symbol}: {e}")
 
     results.sort(key=lambda r: (r['Pct_From_Y_Low'], r['Pct_From_M_Low'], r['Pct_From_W_Low']))
 
