@@ -11,29 +11,10 @@ on:
 jobs:
   scan:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-
-      - name: Install dependencies
-        run: pip install -r backend/requirements.txt
-
-      - name: Run scanner
-        env:
-          CB_CONN_STR: ${{ secrets.CB_CONN_STR }}
-          CB_USERNAME: ${{ secrets.CB_USERNAME }}
-          CB_PASSWORD: ${{ secrets.CB_PASSWORD }}
-        run: python backend/scanner.py --watchlists backend/watchlists
+      - name: Trigger scan via Railway API
+        run: |
+          curl -s -X POST https://cci20-sma20-api-production.up.railway.app/scan \
+            -H "Content-Type: application/json" \
+            --fail \
+            -w "\nHTTP status: %{http_code}\n"

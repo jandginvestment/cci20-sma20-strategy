@@ -2,3 +2,7 @@ couchbase>=4.3.0
 fastapi
 uvicorn[standard]
 orjson
+pandas
+yfinance
+numpy
+tqdm
