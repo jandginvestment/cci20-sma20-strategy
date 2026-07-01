@@ -5,3 +5,4 @@ tqdm
 couchbase>=4.3.0
 fastapi
 uvicorn[standard]
+orjson

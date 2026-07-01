@@ -1,39 +1,66 @@
 import os
+import sys
 import datetime
 import pandas as pd
 import yfinance as yf
 import numpy as np
 from tqdm import tqdm
-from datetime import timedelta
 
-def get_cb_collection():
-    from couchbase.cluster import Cluster
-    from couchbase.options import ClusterOptions
-    from couchbase.auth import PasswordAuthenticator
-    auth = PasswordAuthenticator(os.environ['CB_USERNAME'], os.environ['CB_PASSWORD'])
-    cluster = Cluster(os.environ['CB_CONN_STR'], ClusterOptions(auth))
-    cluster.wait_until_ready(timedelta(seconds=10))
-    return cluster.bucket('scan-results').default_collection()
+# Ensure backend/ is on path so cb_client resolves from any working directory
+_here = os.path.dirname(os.path.abspath(__file__))
+if _here not in sys.path:
+    sys.path.insert(0, _here)
 
-def process_watchlist(watchlist_path, collection):
+from cb_client import (
+    get_cluster, get_collection,
+    result_key, INDEX_KEY, TIMESTAMP_FIELD, BUCKET_NAME,
+)
+
+
+def _read_tickers(watchlist_path: str) -> list[str]:
+    """
+    Read tickers from a CSV file robustly:
+    - Handles both headered ('ticker') and headerless CSVs.
+    - Strips surrounding quotes from values (e.g. '"RELIANCE.NS"' → 'RELIANCE.NS').
+    - Skips blank or non-string rows.
+    """
     try:
-        df_watch = pd.read_csv(watchlist_path)
-        if 'ticker' in df_watch.columns:
-            tickers = df_watch['ticker'].tolist()
+        df = pd.read_csv(watchlist_path)
+        # Normalise: strip quotes from column names
+        df.columns = [c.strip().strip('"').lower() for c in df.columns]
+        if 'ticker' in df.columns:
+            raw = df['ticker'].tolist()
         else:
-            df_watch = pd.read_csv(watchlist_path, header=None)
-            tickers = df_watch[0].tolist()
+            # No recognised header — re-read without header
+            df = pd.read_csv(watchlist_path, header=None)
+            raw = df[0].tolist()
     except Exception as e:
         print(f"Error reading watchlist {watchlist_path}: {e}")
-        return
+        return []
+
+    tickers = []
+    for v in raw:
+        if not isinstance(v, str):
+            continue
+        v = v.strip().strip('"')          # strip surrounding quotes
+        if not v or v.lower() == 'ticker':  # skip blanks and duplicate headers
+            continue
+        tickers.append(v)
+    return tickers
+
+
+def process_watchlist(watchlist_path, collection):
+    tickers = _read_tickers(watchlist_path)
+    if not tickers:
+        return None
 
     results = []
     print(f"Scanning {len(tickers)} tickers from {os.path.basename(watchlist_path)}...")
 
     for ticker in tqdm(tickers):
-        if not isinstance(ticker, str): continue
         ticker_symbol = ticker.strip()
-        if not ticker_symbol: continue
+        if not ticker_symbol:
+            continue
 
         if not ticker_symbol.endswith('.NS') and not ticker_symbol.endswith('.BO'):
             ticker_symbol += '.NS'
@@ -58,17 +85,17 @@ def process_watchlist(watchlist_path, collection):
             df['CCI_20'] = (typical_price - sma_tp) / (0.015 * mean_dev)
 
             latest_price = float(df['Close'].iloc[-1])
-            cci_20      = float(df['CCI_20'].iloc[-1])
-            sma_20      = float(df['SMA_20'].iloc[-1])
+            cci_20       = float(df['CCI_20'].iloc[-1])
+            sma_20       = float(df['SMA_20'].iloc[-1])
 
             # Skip if any key metric is NaN (insufficient data)
             if any(np.isnan(v) for v in [latest_price, cci_20, sma_20]):
                 print(f"  NaN {ticker_symbol}: price={latest_price} cci={cci_20} sma={sma_20}")
                 continue
 
-            yearly_low  = float(df['Low'].rolling(window=252).min().iloc[-1])
-            monthly_low = float(df['Low'].rolling(window=21).min().iloc[-1])
-            weekly_low  = float(df['Low'].rolling(window=5).min().iloc[-1])
+            yearly_low   = float(df['Low'].rolling(window=252).min().iloc[-1])
+            monthly_low  = float(df['Low'].rolling(window=21).min().iloc[-1])
+            weekly_low   = float(df['Low'].rolling(window=5).min().iloc[-1])
 
             pct_from_yearly  = ((latest_price - yearly_low)  / yearly_low)  * 100
             pct_from_monthly = ((latest_price - monthly_low) / monthly_low) * 100
@@ -80,20 +107,20 @@ def process_watchlist(watchlist_path, collection):
             ]
 
             results.append({
-                'Ticker':        ticker_symbol,
-                'Close':         round(latest_price, 2),
-                'CCI_20':        round(cci_20, 2),
-                'SMA_20':        round(sma_20, 2),
-                'Yearly_Low':    round(yearly_low, 2),
-                'Monthly_Low':   round(monthly_low, 2),
-                'Weekly_Low':    round(weekly_low, 2),
-                'Pct_From_Y_Low': round(pct_from_yearly, 2),
-                'Pct_From_M_Low': round(pct_from_monthly, 2),
-                'Pct_From_W_Low': round(pct_from_weekly, 2),
-                'Near_Y_Low':    bool(pct_from_yearly  <= 5.0),
-                'Near_M_Low':    bool(pct_from_monthly <= 5.0),
-                'Near_W_Low':    bool(pct_from_weekly  <= 5.0),
-                'CCI_History':   cci_hist,
+                'Ticker':          ticker_symbol,
+                'Close':           round(latest_price, 2),
+                'CCI_20':          round(cci_20, 2),
+                'SMA_20':          round(sma_20, 2),
+                'Yearly_Low':      round(yearly_low, 2),
+                'Monthly_Low':     round(monthly_low, 2),
+                'Weekly_Low':      round(weekly_low, 2),
+                'Pct_From_Y_Low':  round(pct_from_yearly, 2),
+                'Pct_From_M_Low':  round(pct_from_monthly, 2),
+                'Pct_From_W_Low':  round(pct_from_weekly, 2),
+                'Near_Y_Low':      bool(pct_from_yearly  <= 5.0),
+                'Near_M_Low':      bool(pct_from_monthly <= 5.0),
+                'Near_W_Low':      bool(pct_from_weekly  <= 5.0),
+                'CCI_History':     cci_hist,
             })
 
         except Exception as e:
@@ -103,21 +130,22 @@ def process_watchlist(watchlist_path, collection):
 
     watchlist_name = os.path.splitext(os.path.basename(watchlist_path))[0]
     doc = {
-        'watchlist':  watchlist_name,
-        'results':    results,
-        'scanned_at': datetime.datetime.utcnow().isoformat() + 'Z',
+        'watchlist':      watchlist_name,
+        'results':        results,
+        TIMESTAMP_FIELD:  datetime.datetime.utcnow().isoformat() + 'Z',
     }
-    collection.upsert(f'results::{watchlist_name}', doc)
+    collection.upsert(result_key(watchlist_name), doc)
     print(f"Saved {len(results)} results for '{watchlist_name}' to Couchbase")
     return watchlist_name
+
 
 def purge_existing(cluster, collection):
     """Delete all scan documents before inserting fresh data."""
     from couchbase.exceptions import DocumentNotFoundException
     try:
         result = cluster.query(
-            "SELECT META().id AS doc_id FROM `scan-results`._default._default "
-            "WHERE META().id LIKE 'results::%' OR META().id = 'index::watchlists'"
+            f"SELECT META().id AS doc_id FROM `{BUCKET_NAME}`._default._default "
+            f"WHERE META().id LIKE 'results::%' OR META().id = '{INDEX_KEY}'"
         )
         ids = [row['doc_id'] for row in result]
         for doc_id in ids:
@@ -129,18 +157,14 @@ def purge_existing(cluster, collection):
     except Exception as e:
         print(f"Warning: purge step failed ({e}), proceeding with upsert")
 
+
 def run_scanner(watchlists_dir):
     if not os.path.isdir(watchlists_dir):
         print(f"Error: {watchlists_dir} is not a valid directory.")
         return
 
-    from couchbase.cluster import Cluster
-    from couchbase.options import ClusterOptions
-    from couchbase.auth import PasswordAuthenticator
-    auth = PasswordAuthenticator(os.environ['CB_USERNAME'], os.environ['CB_PASSWORD'])
-    cluster = Cluster(os.environ['CB_CONN_STR'], ClusterOptions(auth))
-    cluster.wait_until_ready(timedelta(seconds=10))
-    collection = cluster.bucket('scan-results').default_collection()
+    cluster    = get_cluster()
+    collection = get_collection(cluster)
 
     purge_existing(cluster, collection)
 
@@ -151,11 +175,12 @@ def run_scanner(watchlists_dir):
             if name:
                 watchlist_names.append({'name': name})
 
-    collection.upsert('index::watchlists', {
-        'watchlists': watchlist_names,
-        'updated_at': datetime.datetime.utcnow().isoformat() + 'Z',
+    collection.upsert(INDEX_KEY, {
+        'watchlists':    watchlist_names,
+        TIMESTAMP_FIELD: datetime.datetime.utcnow().isoformat() + 'Z',
     })
     print(f"Index updated: {len(watchlist_names)} watchlists")
+
 
 if __name__ == "__main__":
     import argparse
