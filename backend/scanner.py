@@ -66,7 +66,9 @@ def process_watchlist(watchlist_path, collection):
             ticker_symbol += '.NS'
 
         try:
-            df = yf.download(ticker_symbol, period="2y", interval="1d", progress=False)
+            end_date = datetime.date.today()
+            start_date = end_date - datetime.timedelta(days=380)  # ~260 trading days
+            df = yf.download(ticker_symbol, start=start_date, end=end_date, interval="1d", progress=False)
 
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.droplevel(1)
