@@ -39,13 +39,13 @@ def process_watchlist(watchlist_path, collection):
             ticker_symbol += '.NS'
 
         try:
-            df = yf.download(ticker_symbol, period="2y", interval="1d", progress=False, auto_adjust=True)
+            df = yf.download(ticker_symbol, period="2y", interval="1d", progress=False)
 
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.droplevel(1)
 
             if df.empty or len(df) < 252:
-                print(f"  SKIP {ticker_symbol}: rows={len(df)} (need 252+)")
+                print(f"  SKIP {ticker_symbol}: rows={len(df)} cols={list(df.columns)}")
                 continue
 
             df['SMA_20'] = df['Close'].rolling(window=20).mean()
@@ -63,6 +63,7 @@ def process_watchlist(watchlist_path, collection):
 
             # Skip if any key metric is NaN (insufficient data)
             if any(np.isnan(v) for v in [latest_price, cci_20, sma_20]):
+                print(f"  NaN {ticker_symbol}: price={latest_price} cci={cci_20} sma={sma_20}")
                 continue
 
             yearly_low  = float(df['Low'].rolling(window=252).min().iloc[-1])
