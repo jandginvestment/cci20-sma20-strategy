@@ -75,3 +75,35 @@ def trigger_scan(background_tasks: BackgroundTasks):
 def _run_scan(watchlists_dir: str):
     from scanner import run_scanner   # backend_dir already on sys.path (see top)
     run_scanner(watchlists_dir)
+
+@app.get("/debug/{ticker}")
+def debug_ticker(ticker: str):
+    """Download one ticker via yfinance and return raw diagnostics."""
+    import yfinance as yf
+    import pandas as pd
+    import numpy as np
+    symbol = ticker if (ticker.endswith('.NS') or ticker.endswith('.BO')) else ticker + '.NS'
+    try:
+        df = yf.download(symbol, period="2y", interval="1d", progress=False)
+        if isinstance(df.columns, pd.MultiIndex):
+            col_info = f"MultiIndex {df.columns.names}"
+            df.columns = df.columns.droplevel(1)
+        else:
+            col_info = "flat"
+        if df.empty:
+            return {"ticker": symbol, "rows": 0, "cols": col_info, "error": "empty dataframe"}
+        close = float(df['Close'].iloc[-1])
+        sma = float(df['Close'].rolling(20).mean().iloc[-1])
+        tp = (df['High'] + df['Low'] + df['Close']) / 3
+        cci = float(((tp - tp.rolling(20).mean()) / (0.015 * tp.rolling(20).apply(lambda x: np.abs(x - x.mean()).mean(), raw=True))).iloc[-1])
+        return {
+            "ticker": symbol,
+            "rows": len(df),
+            "cols": col_info,
+            "close": close,
+            "sma_20": sma,
+            "cci_20": cci,
+            "has_nan": any(np.isnan(v) for v in [close, sma, cci]),
+        }
+    except Exception as e:
+        return {"ticker": symbol, "error": str(e)}
