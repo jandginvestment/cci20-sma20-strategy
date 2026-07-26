@@ -215,7 +215,7 @@ async def trigger_scan(current_user: User = Depends(get_current_user)):
     if not SCANNER_LAMBDA_NAME:
         raise HTTPException(503, "SCANNER_LAMBDA_NAME not configured")
     try:
-        client  = boto3.client("lambda", region_name=os.environ.get("AWS_REGION", "ap-south-1"))
+        client  = boto3.client("lambda", region_name=os.environ.get("AWS_REGION", "ap-southeast-1"))
         payload = {"user_id": str(current_user.id), "cognito_sub": current_user.cognito_sub}
         client.invoke(
             FunctionName=SCANNER_LAMBDA_NAME,

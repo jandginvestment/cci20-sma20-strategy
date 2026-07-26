@@ -14,7 +14,7 @@
 ## Step 1 — Set up Neon PostgreSQL (Free)
 
 1. Sign up at https://console.neon.tech (no credit card)
-2. Create project → region **AWS / ap-south-1 (Mumbai)**
+2. Create project → region **AWS / ap-southeast-1 (Singapore)**
 3. Note your **connection strings** from the dashboard:
    - **Pooled connection** (for Lambda): use as `DATABASE_URL` and `DATABASE_URL_SYNC`
 4. Enable **connection pooling** (PgBouncer) — critical for Lambda cold starts
@@ -48,7 +48,7 @@ alembic upgrade head
 aws configure
 # AWS Access Key ID:     <from IAM console>
 # AWS Secret Access Key: <from IAM console>
-# Default region:        ap-south-1
+# Default region:        ap-southeast-1
 # Output format:         json
 ```
 
@@ -62,7 +62,7 @@ sam build --template infra/template.yaml
 
 sam deploy --guided
 # Stack name:        cci-sma-scanner
-# Region:            ap-south-1
+# Region:            ap-southeast-1
 # Parameter DatabaseUrl:       <your Neon async URL>
 # Parameter DatabaseUrlSync:   <your Neon sync URL>
 # Parameter AdminCognitoSub:   scanner-admin  (update after first login)
@@ -84,19 +84,19 @@ After deploy, note the **Outputs**:
 ```bash
 # Create user in the pool
 aws cognito-idp admin-create-user \
-  --user-pool-id ap-south-1_XXXXXXXX \
+  --user-pool-id ap-southeast-1_XXXXXXXX \
   --username your@email.com \
   --temporary-password TempPass123 \
   --user-attributes Name=email,Value=your@email.com Name=email_verified,Value=true \
-  --region ap-south-1
+  --region ap-southeast-1
 
 # Set permanent password
 aws cognito-idp admin-set-user-password \
-  --user-pool-id ap-south-1_XXXXXXXX \
+  --user-pool-id ap-southeast-1_XXXXXXXX \
   --username your@email.com \
   --password YourPass123 \
   --permanent \
-  --region ap-south-1
+  --region ap-southeast-1
 ```
 
 ---

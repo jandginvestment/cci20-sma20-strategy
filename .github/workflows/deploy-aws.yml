@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: ap-south-1
+  AWS_REGION: ap-southeast-1
   SAM_STACK_NAME: cci-sma-scanner
 
 jobs:

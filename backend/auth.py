@@ -10,8 +10,8 @@ Flow
 5. Returns the User ORM instance — downstream handlers can use it freely.
 
 Environment variables
-  COGNITO_REGION       e.g. ap-south-1
-  COGNITO_USER_POOL_ID e.g. ap-south-1_XXXXXXXX
+  COGNITO_REGION       e.g. ap-southeast-1
+  COGNITO_USER_POOL_ID e.g. ap-southeast-1_XXXXXXXX
   COGNITO_APP_CLIENT_ID  e.g. 5xxxxxxxxxxxxxxxxxxxx
 """
 from __future__ import annotations
@@ -32,7 +32,7 @@ from db.models import User
 
 logger = logging.getLogger(__name__)
 
-COGNITO_REGION        = os.environ.get("COGNITO_REGION", "ap-south-1")
+COGNITO_REGION        = os.environ.get("COGNITO_REGION", "ap-southeast-1")
 COGNITO_USER_POOL_ID  = os.environ.get("COGNITO_USER_POOL_ID", "")
 COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID", "")
 

@@ -27,7 +27,7 @@ services:
     environment:
       DATABASE_URL:          postgresql+asyncpg://scanner:devpass@postgres:5432/scandb
       DATABASE_URL_SYNC:     postgresql://scanner:devpass@postgres:5432/scandb
-      COGNITO_REGION:        ap-south-1
+      COGNITO_REGION:        ap-southeast-1
       COGNITO_USER_POOL_ID:  ""        # leave blank to disable JWT in local dev
       COGNITO_APP_CLIENT_ID: ""
       SCANNER_LAMBDA_NAME:   ""        # no Lambda in local dev
