@@ -1,8 +1,19 @@
-couchbase>=4.3.0
+# Root requirements.txt — mirrors backend/requirements.txt for Railway (main branch only).
+# The aws branch uses infra/template.yaml + SAM — this file is not used there.
+# See backend/requirements.txt for the aws-branch dependency list.
+
 fastapi
-uvicorn[standard]
+mangum
+sqlalchemy[asyncio]>=2.0
+asyncpg
+psycopg2-binary
+alembic
+python-jose[cryptography]
+httpx
+python-multipart
 orjson
 pandas
 yfinance
 numpy
 tqdm
+boto3

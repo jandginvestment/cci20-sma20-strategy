@@ -1,0 +1,44 @@
+services:
+
+  # ── Local PostgreSQL (mirrors Neon schema) ────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       scandb
+      POSTGRES_USER:     scanner
+      POSTGRES_PASSWORD: devpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scanner -d scandb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── FastAPI (API Lambda simulation) ──────────────────────────────────────────
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL:          postgresql+asyncpg://scanner:devpass@postgres:5432/scandb
+      DATABASE_URL_SYNC:     postgresql://scanner:devpass@postgres:5432/scandb
+      COGNITO_REGION:        ap-south-1
+      COGNITO_USER_POOL_ID:  ""        # leave blank to disable JWT in local dev
+      COGNITO_APP_CLIENT_ID: ""
+      SCANNER_LAMBDA_NAME:   ""        # no Lambda in local dev
+      ADMIN_COGNITO_SUB:     dev-admin
+      CORS_ORIGINS:          "http://localhost:4200,http://localhost:3000"
+      SQL_ECHO:              "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app     # hot-reload in dev
+
+volumes:
+  pg_data:

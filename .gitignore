@@ -30,3 +30,18 @@ build_error.txt
 
 # PowerShell helpers (local only)
 *.ps1
+
+# Environment secrets — NEVER commit
+.env
+.env.local
+.env.*.local
+
+# AWS SAM build artifacts
+.aws-sam/
+samconfig.toml
+
+# Docker
+docker-compose.override.yml
+
+# Alembic local state
+backend/db/migrations/versions/*.pyc

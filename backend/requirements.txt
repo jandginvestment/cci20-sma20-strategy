@@ -1,8 +1,18 @@
+# ── API Lambda ──────────────────────────────────────────────────────────────────
+fastapi
+mangum                       # AWS Lambda / API Gateway adapter
+sqlalchemy[asyncio]>=2.0
+asyncpg                      # async PostgreSQL driver (API Lambda)
+psycopg2-binary              # sync PostgreSQL driver (Scanner Lambda)
+alembic                      # database migrations
+python-jose[cryptography]    # Cognito JWT verification
+httpx                        # async HTTP for JWKS fetch
+python-multipart             # multipart/form-data for CSV upload
+orjson                       # fast NaN-safe JSON serialisation
+
+# ── Scanner Lambda ──────────────────────────────────────────────────────────────
 pandas
 yfinance
 numpy
 tqdm
-couchbase>=4.3.0
-fastapi
-uvicorn[standard]
-orjson
+boto3                        # invoke Scanner Lambda + optional S3
