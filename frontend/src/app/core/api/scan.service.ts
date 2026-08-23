@@ -19,7 +19,7 @@ export class ScanService {
   private api = inject(ApiService);
 
   triggerScan(): Observable<ScanTriggerResult> {
-    return this.api.post<ScanTriggerResult>('/scan/trigger', {});
+    return this.api.post<ScanTriggerResult>('/scan', {});
   }
 
   getScanStatus(): Observable<ScanStatus> {
