@@ -45,3 +45,4 @@ docker-compose.override.yml
 
 # Alembic local state
 backend/db/migrations/versions/*.pyc
+*.msi
