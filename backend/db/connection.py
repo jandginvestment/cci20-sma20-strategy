@@ -33,6 +33,8 @@ def _build_async_engine():
         url = os.environ["DATABASE_URL"]
         if not url.startswith("postgresql+asyncpg://"):
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        # asyncpg expects ssl=require instead of sslmode=require
+        url = url.replace("?sslmode=require", "?ssl=require")
 
         _async_engine = create_async_engine(
             url,
