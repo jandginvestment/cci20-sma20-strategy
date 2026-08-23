@@ -51,10 +51,8 @@ export class WatchlistService {
     return this.api.get<WatchlistResults>(`/watchlists/${name}/history/${runId}`);
   }
 
-  createWatchlist(name: string, file: File): Observable<WatchlistMeta> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.api.postForm<WatchlistMeta>(`/watchlists/${name}`, formData);
+  createWatchlist(name: string, tickers: string[]): Observable<WatchlistMeta> {
+    return this.api.post<WatchlistMeta>('/watchlists', { name, tickers });
   }
 
   deleteWatchlist(name: string): Observable<{ deleted: boolean }> {
