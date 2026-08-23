@@ -285,7 +285,7 @@ def run_scanner(watchlists_dir: str, user_id=None):
 
     session.commit()
     session.close()
-    print(f"\n✅ Centralized scan complete. Saved metrics for {saved_count} unique tickers.")
+    print(f"\n[OK] Centralized scan complete. Saved metrics for {saved_count} unique tickers.")
 
 
 # ── CLI entry point ─────────────────────────────────────────────────────────────
