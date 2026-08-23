@@ -1,0 +1,13 @@
+# ── API Lambda only — NO pandas/numpy/yfinance ─────────────────────────────────
+# NOTE: boto3 is pre-installed in AWS Lambda runtime — DO NOT bundle it here
+fastapi
+mangum
+sqlalchemy[asyncio]>=2.0.0
+greenlet==3.0.3
+asyncpg
+psycopg2-binary==2.9.9
+alembic
+python-jose[cryptography]
+httpx
+python-multipart
+orjson

@@ -1,4 +1,6 @@
-# ── API Lambda ──────────────────────────────────────────────────────────────────
+# ── API Lambda — NO pandas/numpy/yfinance ──────────────────────────────────────
+# Scanner runs via GitHub Actions (.github/workflows/scanner.yml)
+# boto3 is pre-installed in AWS Lambda Python 3.11 runtime
 fastapi
 mangum
 sqlalchemy[asyncio]>=2.0.0
@@ -10,9 +12,3 @@ python-jose[cryptography]
 httpx
 python-multipart
 orjson
-
-# ── Scanner Lambda ──────────────────────────────────────────────────────────────
-pandas==2.2.2
-numpy==1.26.4
-yfinance==0.2.40
-tqdm

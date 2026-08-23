@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   CCI/SMA Scanner — AWS SAM (Lambda + API Gateway + Cognito).
-  Trial edition: Neon.tech PostgreSQL (no VPC, no RDS).
+  Scanner runs via GitHub Actions. Lambda serves the read API only.
 
 Parameters:
   DatabaseUrl:
@@ -12,7 +12,7 @@ Parameters:
   DatabaseUrlSync:
     Type: String
     NoEcho: true
-    Description: "postgresql://... (Neon sync URL for Scanner Lambda + Alembic)"
+    Description: "postgresql://... (Neon sync URL — used by GitHub Actions scanner)"
   AdminCognitoSub:
     Type: String
     Default: "scanner-admin"
@@ -25,7 +25,7 @@ Parameters:
 Globals:
   Function:
     Runtime: python3.11
-    Architectures: [x86_64]         # Universal x86_64 wheel compatibility on Windows build
+    Architectures: [x86_64]
     Tracing: Active
     Environment:
       Variables:
@@ -36,8 +36,7 @@ Globals:
         COGNITO_APP_CLIENT_ID: !Ref CognitoUserPoolClient
         ADMIN_COGNITO_SUB:     !Ref AdminCognitoSub
         CORS_ORIGINS:          !Ref CorsOrigins
-        SCANNER_LAMBDA_NAME:   !Ref ScannerFunction
-        AWS_REGION_NAME:       !Ref AWS::Region  # avoid collision with reserved AWS_REGION
+        AWS_REGION_NAME:       !Ref AWS::Region
 
 Resources:
 
@@ -83,18 +82,17 @@ Resources:
         - ALLOW_USER_SRP_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
       PreventUserExistenceErrors: ENABLED
-      AccessTokenValidity: 1         # hours
+      AccessTokenValidity: 1
       IdTokenValidity: 1
-      RefreshTokenValidity: 30       # days
+      RefreshTokenValidity: 30
 
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      # Must be globally unique — AccountId suffix ensures that
       Domain: !Sub "cci-sma-${AWS::AccountId}"
       UserPoolId: !Ref CognitoUserPool
 
-  # ── API Lambda (FastAPI + Mangum) ─────────────────────────────────────────────
+  # ── API Lambda (FastAPI + Mangum) — read-only, no pandas/numpy ────────────────
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -103,41 +101,12 @@ Resources:
       Handler: lambda_handler.handler
       MemorySize: 512
       Timeout: 30
-      Description: "FastAPI scanner API — reads from Neon PostgreSQL"
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action: lambda:InvokeFunction
-              Resource: !GetAtt ScannerFunction.Arn
+      Description: "FastAPI scanner API — reads precomputed metrics from Neon PostgreSQL"
       Events:
         ApiEvent:
           Type: HttpApi
           Properties:
             ApiId: !Ref HttpApi
-
-  # ── Scanner Lambda ────────────────────────────────────────────────────────────
-  ScannerFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: cci-sma-scanner
-      CodeUri: ../backend/
-      Handler: scanner_lambda.handler
-      MemorySize: 1024
-      Timeout: 900          # 15 minutes — yfinance downloads ~200 tickers
-      Description: "CCI/SMA stock scanner — writes to Neon PostgreSQL"
-      Events:
-        MorningCron:
-          Type: Schedule
-          Properties:
-            Schedule: "cron(0 5 ? * MON-FRI *)"    # 10:30 AM IST
-            Description: "Morning scan — NSE market open"
-            Enabled: true
-        EveningCron:
-          Type: Schedule
-          Properties:
-            Schedule: "cron(30 10 ? * MON-FRI *)"  # 4:00 PM IST
-            Description: "Evening scan — NSE market close"
-            Enabled: true
 
   # ── API Gateway HTTP API ──────────────────────────────────────────────────────
   HttpApi:
@@ -157,7 +126,7 @@ Resources:
 # ── Outputs ────────────────────────────────────────────────────────────────────
 Outputs:
   ApiUrl:
-    Description: "API Gateway base URL — set as VITE_API_URL / environment.prod.ts apiUrl"
+    Description: "API Gateway base URL — set as apiUrl in frontend environment"
     Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
     Export:
       Name: !Sub "${AWS::StackName}-ApiUrl"
@@ -169,11 +138,11 @@ Outputs:
       Name: !Sub "${AWS::StackName}-UserPoolId"
 
   CognitoClientId:
-    Description: "COGNITO_APP_CLIENT_ID — also used as Angular environment.cognito.clientId"
+    Description: "COGNITO_APP_CLIENT_ID"
     Value: !Ref CognitoUserPoolClient
     Export:
       Name: !Sub "${AWS::StackName}-ClientId"
 
   CognitoHostedUiDomain:
-    Description: "Cognito Hosted UI base URL — set as environment.cognito.domain"
+    Description: "Cognito Hosted UI base URL"
     Value: !Sub "https://cci-sma-${AWS::AccountId}.auth.${AWS::Region}.amazoncognito.com"
