@@ -99,7 +99,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: cci-sma-api
-      CodeUri: backend/
+      CodeUri: ../backend/
       Handler: lambda_handler.handler
       MemorySize: 512
       Timeout: 30
@@ -120,7 +120,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: cci-sma-scanner
-      CodeUri: backend/
+      CodeUri: ../backend/
       Handler: scanner_lambda.handler
       MemorySize: 1024
       Timeout: 900          # 15 minutes — yfinance downloads ~200 tickers
