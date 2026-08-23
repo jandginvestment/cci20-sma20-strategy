@@ -338,20 +338,14 @@ async def get_results(
         "scanned_at": latest_date.isoformat(),
         "results": [
             {
-                "Ticker":         r.ticker,
-                "Close":          float(r.close)          if r.close          is not None else None,
-                "CCI_20":         float(r.cci_20)         if r.cci_20         is not None else None,
-                "SMA_20":         float(r.sma_20)         if r.sma_20         is not None else None,
-                "Yearly_Low":     float(r.yearly_low)     if r.yearly_low     is not None else None,
-                "Monthly_Low":    float(r.monthly_low)    if r.monthly_low    is not None else None,
-                "Weekly_Low":     float(r.weekly_low)     if r.weekly_low     is not None else None,
-                "Pct_From_Y_Low": float(r.pct_from_y_low) if r.pct_from_y_low is not None else None,
-                "Pct_From_M_Low": float(r.pct_from_m_low) if r.pct_from_m_low is not None else None,
-                "Pct_From_W_Low": float(r.pct_from_w_low) if r.pct_from_w_low is not None else None,
-                "Near_Y_Low":     r.near_y_low,
-                "Near_M_Low":     r.near_m_low,
-                "Near_W_Low":     r.near_w_low,
-                "CCI_History":    r.cci_history or [],
+                "ticker":          r.ticker,
+                "close":           float(r.close)          if r.close          is not None else None,
+                "cci_20":          float(r.cci_20)         if r.cci_20         is not None else None,
+                "sma_20":          float(r.sma_20)         if r.sma_20         is not None else None,
+                "yearly_low_pct":  float(r.pct_from_y_low) if r.pct_from_y_low is not None else None,
+                "monthly_low_pct": float(r.pct_from_m_low) if r.pct_from_m_low is not None else None,
+                "weekly_low_pct":  float(r.pct_from_w_low) if r.pct_from_w_low is not None else None,
+                "cci_history":     r.cci_history or [],
             }
             for r in rows
         ],
