@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main
+      - aws        # also deploy when aws branch frontend changes
     paths:
       - 'frontend/**'
-  workflow_dispatch:
+  workflow_dispatch:  # manual trigger from GitHub UI
 
 # Required permissions for GitHub Pages deployment
 permissions:
@@ -44,7 +45,8 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./frontend/dist/frontend/browser
+          # Angular 19 builder outputs to dist/<project-name>/browser/
+          path: ./frontend/dist/cci-sma-portal/browser
 
   deploy:
     needs: build
