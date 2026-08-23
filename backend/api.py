@@ -1,15 +1,12 @@
 """
-FastAPI application — PostgreSQL + Cognito JWT edition.
-Replaces the Couchbase-backed api.py on the main branch.
+FastAPI application — Centralized Multi-User Edition.
 
-New in v2
-  • All routes require JWT (except /health)
-  • Watchlists are per-user (multi-tenant ready)
-  • POST /watchlists accepts CSV file upload
-  • GET /history/{watchlist} — past scan runs
-  • GET /history/{watchlist}/{run_id} — specific historical run
-  • POST /scan — invokes Scanner Lambda asynchronously (fire & forget)
-  • GET /scan/status — last scan info across all user's watchlists
+Features:
+  • All routes require Cognito JWT authentication (except /health).
+  • Multi-user watchlists with Share IDs (sh_a8f9c2) for sharing and syncing.
+  • User subscription management for shared watchlists.
+  • Zero-compute GET /results/{watchlist} querying centralized daily_stock_metrics.
+  • Trigger Scanner Lambda asynchronously via POST /scan.
 """
 from __future__ import annotations
 
@@ -17,12 +14,15 @@ import json
 import logging
 import os
 import sys
+import uuid
+from typing import List, Optional
 
 import boto3
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
-from sqlalchemy import desc, func, select
+from pydantic import BaseModel
+from sqlalchemy import desc, func, select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 _backend_dir = os.path.dirname(__file__)
@@ -31,7 +31,9 @@ if _backend_dir not in sys.path:
 
 from auth import get_current_user
 from db.connection import get_db
-from db.models import ScanResult, ScanRun, User, Watchlist
+from db.models import (
+    DailyStockMetric, User, UserSubscription, Watchlist, WatchlistItem, generate_share_id
+)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -43,11 +45,22 @@ _raw_origins        = os.environ.get(
 )
 CORS_ORIGINS = [o.strip() for o in _raw_origins.split(",") if o.strip()]
 
+# ── Pydantic Request Models ───────────────────────────────────────────────────
+
+class CreateWatchlistRequest(BaseModel):
+    name: str
+    description: Optional[str] = None
+    tickers: Optional[List[str]] = []
+    is_public: Optional[bool] = False
+
+class AddTickerRequest(BaseModel):
+    ticker: str
+
 # ── App ────────────────────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title="CCI/SMA Scanner API",
-    version="2.0.0",
+    title="CCI/SMA Scanner API — Centralized Edition",
+    version="2.5.0",
     default_response_class=ORJSONResponse,
 )
 
@@ -80,242 +93,249 @@ async def me(current_user: User = Depends(get_current_user)):
         "created_at": current_user.created_at,
     }
 
-# ── Watchlists ─────────────────────────────────────────────────────────────────
+# ── Watchlists & Subscriptions ─────────────────────────────────────────────────
 
 @app.get("/watchlists")
 async def get_watchlists(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Return the authenticated user's watchlists."""
-    result = await db.execute(
+    """Return all watchlists owned by or subscribed to by the user."""
+    # Owned lists
+    owned_res = await db.execute(
+        select(Watchlist).where(Watchlist.owner_id == current_user.id).order_by(Watchlist.name)
+    )
+    owned = owned_res.scalars().all()
+
+    # Subscribed lists
+    sub_res = await db.execute(
         select(Watchlist)
-        .where(Watchlist.user_id == current_user.id)
+        .join(UserSubscription, UserSubscription.watchlist_id == Watchlist.id)
+        .where(UserSubscription.user_id == current_user.id)
         .order_by(Watchlist.name)
     )
-    wls = result.scalars().all()
-    return [{"name": wl.name, "id": wl.id, "created_at": wl.created_at} for wl in wls]
+    subscribed = sub_res.scalars().all()
+
+    result = []
+    for wl in owned:
+        result.append({
+            "id": str(wl.id),
+            "name": wl.name,
+            "description": wl.description,
+            "share_id": wl.share_id,
+            "is_owner": True,
+            "created_at": wl.created_at,
+        })
+    for wl in subscribed:
+        if not any(r["id"] == str(wl.id) for r in result):
+            result.append({
+                "id": str(wl.id),
+                "name": wl.name,
+                "description": wl.description,
+                "share_id": wl.share_id,
+                "is_owner": False,
+                "created_at": wl.created_at,
+            })
+    return result
 
 
 @app.post("/watchlists", status_code=status.HTTP_201_CREATED)
 async def create_watchlist(
-    name: str        = Form(..., description="Watchlist name (alphanumeric + underscore)"),
-    file: UploadFile = File(..., description="CSV file with tickers"),
+    req: CreateWatchlistRequest,
     current_user: User = Depends(get_current_user),
     db: AsyncSession   = Depends(get_db),
 ):
-    """Create a watchlist and upload its CSV ticker file."""
-    name = name.strip()
+    """Create a new personal watchlist with an auto-generated share_id."""
+    name = req.name.strip()
     if not name:
-        raise HTTPException(400, "Name cannot be empty")
+        raise HTTPException(400, "Watchlist name cannot be empty")
 
-    # Duplicate check
     existing = await db.execute(
         select(Watchlist).where(
-            Watchlist.user_id == current_user.id,
-            Watchlist.name    == name,
+            Watchlist.owner_id == current_user.id,
+            Watchlist.name == name,
         )
     )
     if existing.scalar_one_or_none():
         raise HTTPException(409, f"Watchlist '{name}' already exists")
 
-    # Persist CSV
-    watchlists_dir = os.path.join(_backend_dir, "watchlists")
-    os.makedirs(watchlists_dir, exist_ok=True)
-    csv_path = os.path.join(watchlists_dir, f"{name}.csv")
-    content  = await file.read()
-    with open(csv_path, "wb") as fh:
-        fh.write(content)
-
-    # Create DB record
-    wl = Watchlist(user_id=current_user.id, name=name)
+    wl = Watchlist(
+        owner_id=current_user.id,
+        name=name,
+        description=req.description,
+        is_public=req.is_public or False,
+        share_id=generate_share_id(),
+    )
     db.add(wl)
     await db.flush()
-    return {"name": wl.name, "id": wl.id}
 
+    if req.tickers:
+        items = []
+        for t in req.tickers:
+            t = t.strip()
+            if t:
+                if not t.endswith(".NS") and not t.endswith(".BO"):
+                    t += ".NS"
+                items.append(WatchlistItem(watchlist_id=wl.id, ticker=t))
+        if items:
+            db.add_all(items)
+            await db.flush()
 
-@app.delete("/watchlists/{name}")
-async def delete_watchlist(
-    name: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession   = Depends(get_db),
-):
-    wl = await _get_watchlist_or_404(name, current_user, db)
-    await db.delete(wl)
-
-    # Remove CSV file if present
-    csv_path = os.path.join(_backend_dir, "watchlists", f"{name}.csv")
-    if os.path.isfile(csv_path):
-        os.remove(csv_path)
-
-    return {"deleted": name}
-
-# ── Results ────────────────────────────────────────────────────────────────────
-
-@app.get("/results/{watchlist}")
-async def get_results(
-    watchlist: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession   = Depends(get_db),
-):
-    """Return the most recent scan results for a watchlist."""
-    wl  = await _get_watchlist_or_404(watchlist, current_user, db)
-    run = await _get_latest_run(wl.id, db)
-    if not run:
-        raise HTTPException(404, f"No scan results for '{watchlist}' yet — run a scan first")
-    results = await _get_run_results(run.id, db)
-    return _format_results(watchlist, run, results)
-
-
-@app.get("/history/{watchlist}")
-async def get_history(
-    watchlist: str,
-    limit: int = 30,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession   = Depends(get_db),
-):
-    """List past scan run metadata (timestamps, counts) for a watchlist."""
-    wl = await _get_watchlist_or_404(watchlist, current_user, db)
-    result = await db.execute(
-        select(ScanRun)
-        .where(ScanRun.watchlist_id == wl.id)
-        .order_by(desc(ScanRun.scanned_at))
-        .limit(min(limit, 90))
-    )
-    runs = result.scalars().all()
-    return [
-        {"id": r.id, "scanned_at": r.scanned_at, "ticker_count": r.ticker_count}
-        for r in runs
-    ]
-
-
-@app.get("/history/{watchlist}/{run_id}")
-async def get_historical_results(
-    watchlist: str,
-    run_id: int,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession   = Depends(get_db),
-):
-    """Return scan results for a specific historical run id."""
-    wl = await _get_watchlist_or_404(watchlist, current_user, db)
-    result = await db.execute(
-        select(ScanRun).where(ScanRun.id == run_id, ScanRun.watchlist_id == wl.id)
-    )
-    run = result.scalar_one_or_none()
-    if not run:
-        raise HTTPException(404, f"Run {run_id} not found for watchlist '{watchlist}'")
-    results = await _get_run_results(run.id, db)
-    return _format_results(watchlist, run, results)
-
-# ── Scan ───────────────────────────────────────────────────────────────────────
-
-@app.post("/scan")
-async def trigger_scan(current_user: User = Depends(get_current_user)):
-    """Invoke the Scanner Lambda asynchronously (fire-and-forget)."""
-    if not SCANNER_LAMBDA_NAME:
-        raise HTTPException(503, "SCANNER_LAMBDA_NAME not configured")
-    try:
-        client  = boto3.client("lambda", region_name=os.environ.get("AWS_REGION", "ap-southeast-1"))
-        payload = {"user_id": str(current_user.id), "cognito_sub": current_user.cognito_sub}
-        client.invoke(
-            FunctionName=SCANNER_LAMBDA_NAME,
-            InvocationType="Event",   # async — returns immediately
-            Payload=json.dumps(payload).encode(),
-        )
-        return {"status": "scan started", "triggered_by": current_user.email}
-    except Exception as exc:
-        logger.exception("Failed to invoke Scanner Lambda")
-        raise HTTPException(500, str(exc))
-
-
-@app.get("/scan/status")
-async def scan_status(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession   = Depends(get_db),
-):
-    """Most recent scan run across all of the user's watchlists."""
-    result = await db.execute(
-        select(ScanRun, Watchlist.name.label("wl_name"))
-        .join(Watchlist, ScanRun.watchlist_id == Watchlist.id)
-        .where(Watchlist.user_id == current_user.id)
-        .order_by(desc(ScanRun.scanned_at))
-        .limit(1)
-    )
-    row = result.first()
-    if not row:
-        return {"last_scan": None}
-    run, wl_name = row
+    await db.commit()
     return {
-        "last_scan":    run.scanned_at,
-        "watchlist":    wl_name,
-        "ticker_count": run.ticker_count,
+        "id": str(wl.id),
+        "name": wl.name,
+        "share_id": wl.share_id,
+        "item_count": len(req.tickers or []),
     }
 
-# ── Debug ──────────────────────────────────────────────────────────────────────
 
-@app.get("/debug/{ticker}")
-async def debug_ticker(ticker: str, _: User = Depends(get_current_user)):
-    """Download one ticker via yfinance and return raw diagnostics."""
-    import numpy as np
-    import pandas as pd
-    import yfinance as yf
+@app.post("/watchlists/{watchlist_id}/items")
+async def add_item_to_watchlist(
+    watchlist_id: str,
+    req: AddTickerRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession   = Depends(get_db),
+):
+    """Add a ticker symbol to an owned watchlist."""
+    wl = await _get_owned_watchlist(watchlist_id, current_user, db)
+    ticker = req.ticker.strip()
+    if not ticker:
+        raise HTTPException(400, "Ticker symbol required")
+    if not ticker.endswith(".NS") and not ticker.endswith(".BO"):
+        ticker += ".NS"
 
-    symbol = ticker if (ticker.endswith(".NS") or ticker.endswith(".BO")) else ticker + ".NS"
-    try:
-        df = yf.download(symbol, period="2y", interval="1d", progress=False)
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = df.columns.droplevel(1)
-        if df.empty:
-            return {"ticker": symbol, "rows": 0, "error": "empty dataframe"}
-        close = float(df["Close"].iloc[-1])
-        sma   = float(df["Close"].rolling(20).mean().iloc[-1])
-        tp    = (df["High"] + df["Low"] + df["Close"]) / 3
-        cci   = float(
-            ((tp - tp.rolling(20).mean())
-             / (0.015 * tp.rolling(20).apply(lambda x: np.abs(x - x.mean()).mean(), raw=True))
-             ).iloc[-1]
+    existing = await db.execute(
+        select(WatchlistItem).where(
+            WatchlistItem.watchlist_id == wl.id,
+            WatchlistItem.ticker == ticker,
         )
-        return {
-            "ticker": symbol, "rows": len(df),
-            "close": close, "sma_20": sma, "cci_20": cci,
-            "has_nan": any(np.isnan(v) for v in [close, sma, cci]),
-        }
-    except Exception as exc:
-        return {"ticker": symbol, "error": str(exc)}
-
-# ── Helpers ────────────────────────────────────────────────────────────────────
-
-async def _get_watchlist_or_404(name: str, user: User, db: AsyncSession) -> Watchlist:
-    result = await db.execute(
-        select(Watchlist).where(Watchlist.user_id == user.id, Watchlist.name == name)
     )
-    wl = result.scalar_one_or_none()
+    if existing.scalar_one_or_none():
+        return {"status": "exists", "ticker": ticker}
+
+    item = WatchlistItem(watchlist_id=wl.id, ticker=ticker)
+    db.add(item)
+    await db.commit()
+    return {"status": "added", "ticker": ticker, "watchlist_id": str(wl.id)}
+
+
+@app.delete("/watchlists/{watchlist_id}/items/{ticker}")
+async def remove_item_from_watchlist(
+    watchlist_id: str,
+    ticker: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession   = Depends(get_db),
+):
+    """Remove a ticker symbol from an owned watchlist."""
+    wl = await _get_owned_watchlist(watchlist_id, current_user, db)
+    symbol = ticker.strip()
+    if not symbol.endswith(".NS") and not symbol.endswith(".BO"):
+        symbol += ".NS"
+
+    item_res = await db.execute(
+        select(WatchlistItem).where(
+            WatchlistItem.watchlist_id == wl.id,
+            WatchlistItem.ticker == symbol,
+        )
+    )
+    item = item_res.scalar_one_or_none()
+    if item:
+        await db.delete(item)
+        await db.commit()
+    return {"status": "removed", "ticker": symbol}
+
+
+@app.get("/watchlists/share/{share_id}")
+async def get_watchlist_by_share_id(
+    share_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Preview a shared watchlist by share_id."""
+    res = await db.execute(select(Watchlist).where(Watchlist.share_id == share_id))
+    wl = res.scalar_one_or_none()
     if not wl:
-        raise HTTPException(404, f"Watchlist '{name}' not found")
-    return wl
+        raise HTTPException(404, "Invalid share_id or watchlist not found")
 
+    items_res = await db.execute(select(WatchlistItem.ticker).where(WatchlistItem.watchlist_id == wl.id))
+    tickers = items_res.scalars().all()
 
-async def _get_latest_run(watchlist_id: int, db: AsyncSession) -> ScanRun | None:
-    result = await db.execute(
-        select(ScanRun)
-        .where(ScanRun.watchlist_id == watchlist_id)
-        .order_by(desc(ScanRun.scanned_at))
-        .limit(1)
-    )
-    return result.scalar_one_or_none()
-
-
-async def _get_run_results(run_id: int, db: AsyncSession) -> list[ScanResult]:
-    result = await db.execute(
-        select(ScanResult).where(ScanResult.scan_run_id == run_id)
-    )
-    return list(result.scalars().all())
-
-
-def _format_results(watchlist: str, run: ScanRun, rows: list[ScanResult]) -> dict:
     return {
-        "watchlist":  watchlist,
-        "scanned_at": run.scanned_at.isoformat() + "Z",
+        "id": str(wl.id),
+        "name": wl.name,
+        "description": wl.description,
+        "share_id": wl.share_id,
+        "tickers": list(tickers),
+    }
+
+
+@app.post("/watchlists/subscribe/{share_id}")
+async def subscribe_to_watchlist(
+    share_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession   = Depends(get_db),
+):
+    """Subscribe to a shared watchlist using share_id."""
+    res = await db.execute(select(Watchlist).where(Watchlist.share_id == share_id))
+    wl = res.scalar_one_or_none()
+    if not wl:
+        raise HTTPException(404, "Invalid share_id or watchlist not found")
+
+    if wl.owner_id == current_user.id:
+        return {"status": "owned", "name": wl.name, "share_id": wl.share_id}
+
+    sub_res = await db.execute(
+        select(UserSubscription).where(
+            UserSubscription.user_id == current_user.id,
+            UserSubscription.watchlist_id == wl.id,
+        )
+    )
+    if sub_res.scalar_one_or_none():
+        return {"status": "already_subscribed", "name": wl.name, "share_id": wl.share_id}
+
+    sub = UserSubscription(user_id=current_user.id, watchlist_id=wl.id)
+    db.add(sub)
+    await db.commit()
+    return {"status": "subscribed", "name": wl.name, "share_id": wl.share_id}
+
+# ── Centralized Results Query ───────────────────────────────────────────────────
+
+@app.get("/results/{watchlist_identifier}")
+async def get_results(
+    watchlist_identifier: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession   = Depends(get_db),
+):
+    """
+    Return scan results for a watchlist (identified by name, id, or share_id).
+    Queries daily_stock_metrics cache table using a high-speed SQL JOIN.
+    """
+    wl = await _resolve_watchlist(watchlist_identifier, current_user, db)
+
+    # Fetch latest metrics date
+    latest_date_res = await db.execute(select(func.max(DailyStockMetric.scan_date)))
+    latest_date = latest_date_res.scalar()
+
+    if not latest_date:
+        raise HTTPException(404, "No stock metric scans available yet — run a scan first")
+
+    # SQL JOIN: watchlist_items ──► daily_stock_metrics
+    query = (
+        select(DailyStockMetric)
+        .join(WatchlistItem, WatchlistItem.ticker == DailyStockMetric.ticker)
+        .where(
+            WatchlistItem.watchlist_id == wl.id,
+            DailyStockMetric.scan_date == latest_date,
+        )
+        .order_by(DailyStockMetric.ticker)
+    )
+    res = await db.execute(query)
+    rows = res.scalars().all()
+
+    return {
+        "watchlist": wl.name,
+        "share_id":  wl.share_id,
+        "scanned_at": latest_date.isoformat(),
         "results": [
             {
                 "Ticker":         r.ticker,
@@ -336,3 +356,72 @@ def _format_results(watchlist: str, run: ScanRun, rows: list[ScanResult]) -> dic
             for r in rows
         ],
     }
+
+# ── Scan Trigger ───────────────────────────────────────────────────────────────
+
+@app.post("/scan")
+async def trigger_scan(current_user: User = Depends(get_current_user)):
+    """Invoke the Scanner Lambda asynchronously (fire-and-forget)."""
+    if not SCANNER_LAMBDA_NAME:
+        raise HTTPException(503, "SCANNER_LAMBDA_NAME not configured")
+    try:
+        client  = boto3.client("lambda", region_name=os.environ.get("AWS_REGION", "ap-southeast-1"))
+        payload = {"user_id": str(current_user.id), "cognito_sub": current_user.cognito_sub}
+        client.invoke(
+            FunctionName=SCANNER_LAMBDA_NAME,
+            InvocationType="Event",
+            Payload=json.dumps(payload).encode(),
+        )
+        return {"status": "scan started", "triggered_by": current_user.email}
+    except Exception as exc:
+        logger.exception("Failed to invoke Scanner Lambda")
+        raise HTTPException(500, str(exc))
+
+# ── Helpers ────────────────────────────────────────────────────────────────────
+
+async def _get_owned_watchlist(watchlist_id: str, user: User, db: AsyncSession) -> Watchlist:
+    try:
+        wl_uuid = uuid.UUID(watchlist_id)
+        stmt = select(Watchlist).where(Watchlist.id == wl_uuid, Watchlist.owner_id == user.id)
+    except ValueError:
+        stmt = select(Watchlist).where(Watchlist.name == watchlist_id, Watchlist.owner_id == user.id)
+
+    res = await db.execute(stmt)
+    wl = res.scalar_one_or_none()
+    if not wl:
+        raise HTTPException(404, f"Watchlist '{watchlist_id}' not found or not owned by user")
+    return wl
+
+
+async def _resolve_watchlist(identifier: str, user: User, db: AsyncSession) -> Watchlist:
+    """Resolve watchlist by UUID, Share ID, or Name."""
+    # 1. By UUID
+    try:
+        wl_uuid = uuid.UUID(identifier)
+        res = await db.execute(select(Watchlist).where(Watchlist.id == wl_uuid))
+        wl = res.scalar_one_or_none()
+        if wl:
+            return wl
+    except ValueError:
+        pass
+
+    # 2. By Share ID
+    if identifier.startswith("sh_"):
+        res = await db.execute(select(Watchlist).where(Watchlist.share_id == identifier))
+        wl = res.scalar_one_or_none()
+        if wl:
+            return wl
+
+    # 3. By Name (owned or public)
+    res = await db.execute(
+        select(Watchlist).where(
+            Watchlist.name == identifier,
+            or_(Watchlist.owner_id == user.id, Watchlist.is_public == True)
+        )
+    )
+    wl = res.scalar_one_or_none()
+    if wl:
+        return wl
+
+    raise HTTPException(404, f"Watchlist '{identifier}' not found")
+
