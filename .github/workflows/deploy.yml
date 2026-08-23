@@ -42,6 +42,9 @@ jobs:
         run: npx ng build --configuration production --base-href "/cci20-sma20-strategy/"
         working-directory: frontend
 
+      - name: Copy index.html to 404.html for SPA routing
+        run: cp ./frontend/dist/cci-sma-portal/browser/index.html ./frontend/dist/cci-sma-portal/browser/404.html
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
