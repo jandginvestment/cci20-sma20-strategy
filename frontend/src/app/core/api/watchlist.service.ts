@@ -40,7 +40,7 @@ export class WatchlistService {
   }
 
   getResults(name: string): Observable<WatchlistResults> {
-    return this.api.get<WatchlistResults>(`/watchlists/${name}/results`);
+    return this.api.get<WatchlistResults>(`/results/${name}`);
   }
 
   getHistory(name: string): Observable<HistoryRun[]> {
