@@ -103,7 +103,7 @@ async def get_watchlists(
     """Return all watchlists owned by or subscribed to by the user."""
     # Owned lists
     owned_res = await db.execute(
-        select(Watchlist).where(Watchlist.owner_id == current_user.id).order_by(Watchlist.name)
+        select(Watchlist).where(Watchlist.user_id == current_user.id).order_by(Watchlist.name)
     )
     owned = owned_res.scalars().all()
 
@@ -152,7 +152,7 @@ async def create_watchlist(
 
     existing = await db.execute(
         select(Watchlist).where(
-            Watchlist.owner_id == current_user.id,
+            Watchlist.user_id == current_user.id,
             Watchlist.name == name,
         )
     )
@@ -160,7 +160,7 @@ async def create_watchlist(
         raise HTTPException(409, f"Watchlist '{name}' already exists")
 
     wl = Watchlist(
-        owner_id=current_user.id,
+        user_id=current_user.id,
         name=name,
         description=req.description,
         is_public=req.is_public or False,
@@ -281,8 +281,8 @@ async def subscribe_to_watchlist(
     if not wl:
         raise HTTPException(404, "Invalid share_id or watchlist not found")
 
-    if wl.owner_id == current_user.id:
-        return {"status": "owned", "name": wl.name, "share_id": wl.share_id}
+    if wl.user_id == current_user.id:
+        return {"status": "already_owned", "name": wl.name, "share_id": wl.share_id}
 
     sub_res = await db.execute(
         select(UserSubscription).where(
@@ -381,9 +381,9 @@ async def trigger_scan(current_user: User = Depends(get_current_user)):
 
 async def _get_owned_watchlist(watchlist_id: str, user: User, db: AsyncSession) -> Watchlist:
     if watchlist_id.isdigit():
-        stmt = select(Watchlist).where(Watchlist.id == int(watchlist_id), Watchlist.owner_id == user.id)
+        stmt = select(Watchlist).where(Watchlist.id == int(watchlist_id), Watchlist.user_id == user.id)
     else:
-        stmt = select(Watchlist).where(Watchlist.name == watchlist_id, Watchlist.owner_id == user.id)
+        stmt = select(Watchlist).where(Watchlist.name == watchlist_id, Watchlist.user_id == user.id)
 
     res = await db.execute(stmt)
     wl = res.scalar_one_or_none()
@@ -412,7 +412,7 @@ async def _resolve_watchlist(identifier: str, user: User, db: AsyncSession) -> W
     res = await db.execute(
         select(Watchlist).where(
             Watchlist.name == identifier,
-            or_(Watchlist.owner_id == user.id, Watchlist.is_public == True)
+            or_(Watchlist.user_id == user.id, Watchlist.is_public == True)
         )
     )
     wl = res.scalar_one_or_none()

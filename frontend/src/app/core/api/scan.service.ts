@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService } from './api.service';
-import { Observable } from 'rxjs';
-
+import { Observable, of } from 'rxjs';
 export interface ScanStatus {
   last_scan: string | null;
   watchlist: string | null;
@@ -23,6 +22,11 @@ export class ScanService {
   }
 
   getScanStatus(): Observable<ScanStatus> {
-    return this.api.get<ScanStatus>('/scan/status');
+    return of({
+      last_scan: null,
+      watchlist: null,
+      ticker_count: 0,
+      scan_in_progress: false
+    });
   }
 }
