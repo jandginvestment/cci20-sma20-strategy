@@ -25,7 +25,7 @@ Parameters:
 Globals:
   Function:
     Runtime: python3.11
-    Architectures: [arm64]          # Graviton2 — cheaper + faster than x86
+    Architectures: [x86_64]         # Universal x86_64 wheel compatibility on Windows build
     Tracing: Active
     Environment:
       Variables:
