@@ -1,8 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  CCI/SMA Scanner — AWS SAM (Lambda + API Gateway + Cognito).
-  Scanner runs via GitHub Actions. Lambda serves the read API only.
+  CCI/SMA Scanner — Full enterprise AWS deployment.
+  API Lambda (zip, ~35MB) + Scanner Lambda (ECR container image, no size limit).
+  EventBridge cron triggers scanner twice daily. Zero GitHub Actions dependency.
 
 Parameters:
   DatabaseUrl:
@@ -12,7 +13,7 @@ Parameters:
   DatabaseUrlSync:
     Type: String
     NoEcho: true
-    Description: "postgresql://... (Neon sync URL — used by GitHub Actions scanner)"
+    Description: "postgresql://... (Neon sync URL for Scanner Lambda)"
   AdminCognitoSub:
     Type: String
     Default: "scanner-admin"
@@ -24,8 +25,6 @@ Parameters:
 
 Globals:
   Function:
-    Runtime: python3.11
-    Architectures: [x86_64]
     Tracing: Active
     Environment:
       Variables:
@@ -92,16 +91,78 @@ Resources:
       Domain: !Sub "cci-sma-${AWS::AccountId}"
       UserPoolId: !Ref CognitoUserPool
 
-  # ── API Lambda (FastAPI + Mangum) — read-only, no pandas/numpy ────────────────
+  # ── ECR Repository for Scanner container image ────────────────────────────────
+  ScannerImageRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: cci-sma-scanner
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [{
+              "rulePriority": 1,
+              "description": "Keep only last 3 images",
+              "selection": {
+                "tagStatus": "any",
+                "countType": "imageCountMoreThan",
+                "countNumber": 3
+              },
+              "action": { "type": "expire" }
+            }]
+          }
+
+  # ── Scanner Lambda (Container Image — no 250MB limit) ─────────────────────────
+  ScannerFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      DockerTag: latest
+      DockerContext: ../backend
+      Dockerfile: Dockerfile.scanner
+    Properties:
+      FunctionName: cci-sma-scanner
+      PackageType: Image
+      ImageConfig:
+        Command: ["scanner_lambda.handler"]
+      Architectures: [x86_64]
+      MemorySize: 1024
+      Timeout: 900          # 15 minutes — yfinance downloads ~600 tickers
+      Description: "CCI/SMA stock scanner — pandas/numpy/yfinance via ECR container"
+      Events:
+        MorningCron:
+          Type: Schedule
+          Properties:
+            Schedule: "cron(0 5 ? * MON-FRI *)"     # 10:30 AM IST
+            Description: "Morning scan — NSE market open"
+            Enabled: true
+        EveningCron:
+          Type: Schedule
+          Properties:
+            Schedule: "cron(30 10 ? * MON-FRI *)"   # 4:00 PM IST
+            Description: "Evening scan — NSE market close"
+            Enabled: true
+
+  # ── API Lambda (zip, ~35MB — FastAPI + Mangum, no pandas/numpy) ───────────────
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: cci-sma-api
       CodeUri: ../backend/
       Handler: lambda_handler.handler
+      Runtime: python3.11
+      Architectures: [x86_64]
       MemorySize: 512
       Timeout: 30
       Description: "FastAPI scanner API — reads precomputed metrics from Neon PostgreSQL"
+      Environment:
+        Variables:
+          SCANNER_LAMBDA_NAME: !Ref ScannerFunction
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              Resource: !GetAtt ScannerFunction.Arn
       Events:
         ApiEvent:
           Type: HttpApi
@@ -126,10 +187,16 @@ Resources:
 # ── Outputs ────────────────────────────────────────────────────────────────────
 Outputs:
   ApiUrl:
-    Description: "API Gateway base URL — set as apiUrl in frontend environment"
+    Description: "API Gateway base URL"
     Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
     Export:
       Name: !Sub "${AWS::StackName}-ApiUrl"
+
+  ScannerEcrRepo:
+    Description: "ECR repository URI for scanner container image"
+    Value: !GetAtt ScannerImageRepo.RepositoryUri
+    Export:
+      Name: !Sub "${AWS::StackName}-ScannerEcrRepo"
 
   CognitoUserPoolId:
     Description: "COGNITO_USER_POOL_ID"
