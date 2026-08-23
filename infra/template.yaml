@@ -91,29 +91,8 @@ Resources:
       Domain: !Sub "cci-sma-${AWS::AccountId}"
       UserPoolId: !Ref CognitoUserPool
 
-  # ── ECR Repository for Scanner container image ────────────────────────────────
-  ScannerImageRepo:
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName: cci-sma-scanner
-      ImageScanningConfiguration:
-        ScanOnPush: true
-      LifecyclePolicy:
-        LifecyclePolicyText: |
-          {
-            "rules": [{
-              "rulePriority": 1,
-              "description": "Keep only last 3 images",
-              "selection": {
-                "tagStatus": "any",
-                "countType": "imageCountMoreThan",
-                "countNumber": 3
-              },
-              "action": { "type": "expire" }
-            }]
-          }
-
   # ── Scanner Lambda (Container Image — no 250MB limit) ─────────────────────────
+  # ECR repo 'cci-sma-scanner' already created manually via aws ecr create-repository
   ScannerFunction:
     Type: AWS::Serverless::Function
     Metadata:
@@ -194,7 +173,7 @@ Outputs:
 
   ScannerEcrRepo:
     Description: "ECR repository URI for scanner container image"
-    Value: !GetAtt ScannerImageRepo.RepositoryUri
+    Value: !Sub "493822200263.dkr.ecr.${AWS::Region}.amazonaws.com/cci-sma-scanner"
     Export:
       Name: !Sub "${AWS::StackName}-ScannerEcrRepo"
 

@@ -1,0 +1,245 @@
+{
+  "_format": "tt-strategy/v2",
+  "_readme": {
+    "about": "Tradetron strategy export. Edit and re-import via the ASB Import button.",
+    "logic": "To change a condition's logic, edit its \"conditionJson\" (the AST). The \"conditionValue\"/\"conditionDisplay\" text is regenerated from it on import.",
+    "legs": "For a leg field that has a \"*Json\" (e.g. \"strikeJson\"), edit the JSON — its text form is regenerated on import. Fields with no \"*Json\" (e.g. \"qty\") are plain text: edit them directly.",
+    "structure": "Add/remove/duplicate legs, conditions or sets by editing the arrays.",
+    "do_not": "Do not add \"*_id\" foreign keys back. Lists referenced by id must be ones you own."
+  },
+  "name": "RSI - 15m - VIX 13-20 band",
+  "description": null,
+  "tags": [],
+  "variables": [],
+  "sets": [
+    {
+      "list": 0,
+      "name": null,
+      "conditions": [
+        {
+          "type": "Entry",
+          "conditionValue": "( tt_Time ( 'NSE' ) >= tt_Number ( '1000' ) ) and ( tt_Time ( 'NSE' ) <= tt_Number ( '1445' ) ) and ( tt_get_element ( tt_cross ( tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , tt_EMA ( tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) ) , '-1' ) ) and ( tt_get_element ( tt_RSI_series ( tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) , '-1' ) > tt_Number ( '50' ) ) and ( tt_NetQty ( 'strategy_id', 'run_counter', find_traded_instrument ( 'strategy_id', 'run_counter', 'Entry', 'instrument', 'NIFTY 50', '1', '1', '1' ) ) == tt_Number ( '0' ) ) and ( tt_NetQty ( 'strategy_id', 'run_counter', find_traded_instrument ( 'strategy_id', 'run_counter', 'Entry', 'instrument', 'NIFTY 50', '2', '1', '1' ) ) == tt_Number ( '0' ) ) and ( ( tt_get_var ( tt_get_instrument ( 'NSE_IDX,INDIA VIX,,,,,' ) , 'LTP' ) > tt_Number ( '13' ) ) and ( tt_get_var ( tt_get_instrument ( 'NSE_IDX,INDIA VIX,,,,,' ) , 'LTP' ) < tt_Number ( '20' ) ) )",
+          "conditionJson": "{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_0\",\"elements\":[{\"name\":\"Time\",\"kid\":5845,\"params\":[{\"type\":\"value\",\"value\":\"NSE\"}]},{\"name\":\">=\",\"params\":[]},{\"name\":\"Number\",\"kid\":8786,\"params\":[{\"type\":\"value\",\"value\":\"1000\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_1\",\"elements\":[{\"name\":\"Time\",\"kid\":5845,\"params\":[{\"type\":\"value\",\"value\":\"NSE\"}]},{\"name\":\"<=\",\"params\":[]},{\"name\":\"Number\",\"kid\":8786,\"params\":[{\"type\":\"value\",\"value\":\"1445\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_2\",\"elements\":[{\"name\":\"Position\",\"kid\":6444,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Cross\",\"kid\":8422,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":8329,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":7311,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":2507,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}},{\"type\":\"keyword\",\"keyword\":{\"name\":\"EMA\",\"kid\":7454,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":9640,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":8847,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":5476,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}},{\"type\":\"value\",\"value\":\"20\"}]}}]}},{\"type\":\"value\",\"value\":\"-1\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_3\",\"elements\":[{\"name\":\"Position\",\"kid\":4069,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"RSI Series\",\"kid\":8196,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":1688,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":8498,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":1290,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}},{\"type\":\"value\",\"value\":\"20\"}]}},{\"type\":\"value\",\"value\":\"-1\"}]},{\"name\":\">\",\"params\":[]},{\"name\":\"Number\",\"kid\":3792,\"params\":[{\"type\":\"value\",\"value\":\"50\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_4\",\"elements\":[{\"name\":\"Net Quantity\",\"kid\":6028,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Traded Instrument Name\",\"kid\":9602,\"params\":[{\"type\":\"value\",\"value\":\"Entry\"},{\"type\":\"value\",\"value\":\"instrument\"},{\"type\":\"value\",\"value\":\"NIFTY 50\"},{\"type\":\"value\",\"value\":\"1\"},{\"type\":\"value\",\"value\":\"1\"},{\"type\":\"value\",\"value\":\"1\"}]}}]},{\"name\":\"==\",\"params\":[]},{\"name\":\"Number\",\"kid\":3792,\"params\":[{\"type\":\"value\",\"value\":\"0\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_5\",\"elements\":[{\"name\":\"Net Quantity\",\"kid\":6028,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Traded Instrument Name\",\"kid\":9602,\"params\":[{\"type\":\"value\",\"value\":\"Entry\"},{\"type\":\"value\",\"value\":\"instrument\"},{\"type\":\"value\",\"value\":\"NIFTY 50\"},{\"type\":\"value\",\"value\":\"2\"},{\"type\":\"value\",\"value\":\"1\"},{\"type\":\"value\",\"value\":\"1\"}]}}]},{\"name\":\"==\",\"params\":[]},{\"name\":\"Number\",\"kid\":3792,\"params\":[{\"type\":\"value\",\"value\":\"0\"}]}]},{\"type\":\"group\",\"value\":\"builder-basic_group_6\",\"children\":{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_6\",\"elements\":[{\"name\":\"LTP\",\"kid\":6373,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":8755,\"params\":[{\"type\":\"value\",\"value\":\"NSE_IDX,INDIA VIX,,,,,\"}]}}]},{\"name\":\">\",\"params\":[]},{\"name\":\"Number\",\"kid\":6897,\"params\":[{\"type\":\"value\",\"value\":\"13\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_7\",\"elements\":[{\"name\":\"LTP\",\"kid\":6373,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":8755,\"params\":[{\"type\":\"value\",\"value\":\"NSE_IDX,INDIA VIX,,,,,\"}]}}]},{\"name\":\"<\",\"params\":[]},{\"name\":\"Number\",\"kid\":6897,\"params\":[{\"type\":\"value\",\"value\":\"20\"}]}]}]}}]}",
+          "conditionDisplay": "( Time ( 'NSE' ) >= Number ( '1000' ) ) and ( Time ( 'NSE' ) <= Number ( '1445' ) ) and ( Position ( Cross ( CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , EMA ( CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) ) , '-1' ) ) and ( Position ( RSI Series ( CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) , '-1' ) > Number ( '50' ) ) and ( Net Quantity ( 'strategy_id', 'run_counter', Traded Instrument Name ( 'strategy_id', 'run_counter', 'Entry', 'instrument', 'NIFTY 50', '1', '1', '1' ) ) == Number ( '0' ) ) and ( Net Quantity ( 'strategy_id', 'run_counter', Traded Instrument Name ( 'strategy_id', 'run_counter', 'Entry', 'instrument', 'NIFTY 50', '2', '1', '1' ) ) == Number ( '0' ) ) and ( ( LTP ( Instrument Name ( 'NSE_IDX,INDIA VIX,,,,,' ) , 'LTP' ) > Number ( '13' ) ) and ( LTP ( Instrument Name ( 'NSE_IDX,INDIA VIX,,,,,' ) , 'LTP' ) < Number ( '20' ) ) )",
+          "subType": "None",
+          "visible": 1,
+          "legs": [
+            {
+              "instrument": "1855",
+              "list": 0,
+              "optionType": "CE",
+              "expiryType": "Current Week",
+              "expiry": "tt_curr_weekexpiry('NIFTY 50')",
+              "expiryJson": null,
+              "expiryDisplay": null,
+              "strikeType": "Fx",
+              "strike": "( tt_round ( tt_get_var ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , 'LTP' ) , '50' ) )",
+              "strikeJson": "{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_0\",\"elements\":[{\"name\":\"Round\",\"kid\":8588,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"LTP\",\"kid\":2380,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":7210,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}}]}},{\"type\":\"value\",\"value\":\"50\"}]}]}]}",
+              "strikeDisplay": "( Round ( LTP ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , 'LTP' ) , '50' ) )",
+              "qty": "tt_lots(1,'INSTRUMENT','CE')",
+              "qtyType": "Lots",
+              "qtyDisplay": "1",
+              "qtyJson": null,
+              "qtyExprDisplay": null,
+              "limitPrice": null,
+              "limitPriceDisplay": null,
+              "limitPriceJson": null,
+              "limitPriceExprDisplay": null,
+              "buySell": "B",
+              "entryLimit": null,
+              "entryTrigger": null,
+              "sLLimit": null,
+              "sLTrigger": null,
+              "sLTriggerDisplay": null,
+              "sLTriggerJson": null,
+              "sLTriggerExprDisplay": null,
+              "targetLimit": null,
+              "targetTrigger": null,
+              "productType": "NRML",
+              "underlyingSymbol": "NIFTY 50",
+              "isOvernightProtectionLeg": "No",
+              "updatedAt": "2026-07-18 17:31:31",
+              "createdAt": "2026-07-18 17:31:31"
+            }
+          ],
+          "extra": {
+            "name": null,
+            "variables": [
+              {
+                "variableName": "traded",
+                "value": "( tt_Number ( '1' )  )",
+                "display": "( Number ( '1' )  )",
+                "json": "{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_0\",\"elements\":[{\"name\":\"Number\",\"kid\":5950,\"params\":[{\"type\":\"value\",\"value\":\"1\"}]}]}]}"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Exit",
+          "conditionValue": "( tt_get_element ( tt_cross ( tt_EMA ( tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) , tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) ) , '-1' ) )",
+          "conditionJson": "{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_0\",\"elements\":[{\"name\":\"Position\",\"kid\":9240,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Cross\",\"kid\":7251,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"EMA\",\"kid\":9845,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":4382,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":7657,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":4143,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}},{\"type\":\"value\",\"value\":\"20\"}]}},{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":9335,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":3484,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":9835,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}}]}},{\"type\":\"value\",\"value\":\"-1\"}]}]}]}",
+          "conditionDisplay": "( Position ( Cross ( EMA ( CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) , CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) ) , '-1' ) )",
+          "subType": "None",
+          "visible": 1,
+          "legs": [],
+          "extra": {
+            "name": null,
+            "variables": []
+          }
+        }
+      ]
+    },
+    {
+      "list": 0,
+      "name": null,
+      "conditions": [
+        {
+          "type": "Entry",
+          "conditionValue": "( tt_get_element ( tt_cross ( tt_EMA ( tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) , tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) ) , '-1' ) ) and ( tt_Time ( 'NSE' ) >= tt_Number ( '1000' ) ) and ( tt_Time ( 'NSE' ) <= tt_Number ( '1445' ) ) and ( tt_get_element ( tt_RSI_series ( tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) , '-1' ) < tt_Number ( '50' ) ) and ( tt_NetQty ( 'strategy_id', 'run_counter', find_traded_instrument ( 'strategy_id', 'run_counter', 'Entry', 'instrument', 'NIFTY 50', '2', '1', '1' ) ) == tt_Number ( '0' ) ) and ( tt_NetQty ( 'strategy_id', 'run_counter', find_traded_instrument ( 'strategy_id', 'run_counter', 'Entry', 'instrument', 'NIFTY 50', '1', '1', '1' ) ) == tt_Number ( '0' ) ) and ( ( tt_get_var ( tt_get_instrument ( 'NSE_IDX,INDIA VIX,,,,,' ) , 'LTP' ) > tt_Number ( '13' ) ) and ( tt_get_var ( tt_get_instrument ( 'NSE_IDX,INDIA VIX,,,,,' ) , 'LTP' ) < tt_Number ( '20' ) ) )",
+          "conditionJson": "{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_0\",\"elements\":[{\"name\":\"Position\",\"kid\":9240,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Cross\",\"kid\":7251,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"EMA\",\"kid\":9845,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":4382,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":7657,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":4143,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}},{\"type\":\"value\",\"value\":\"20\"}]}},{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":9335,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":3484,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":9835,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}}]}},{\"type\":\"value\",\"value\":\"-1\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_1\",\"elements\":[{\"name\":\"Time\",\"kid\":7537,\"params\":[{\"type\":\"value\",\"value\":\"NSE\"}]},{\"name\":\">=\",\"params\":[]},{\"name\":\"Number\",\"kid\":6900,\"params\":[{\"type\":\"value\",\"value\":\"1000\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_5\",\"elements\":[{\"name\":\"Time\",\"kid\":7537,\"params\":[{\"type\":\"value\",\"value\":\"NSE\"}]},{\"name\":\"<=\",\"params\":[]},{\"name\":\"Number\",\"kid\":6900,\"params\":[{\"type\":\"value\",\"value\":\"1445\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_2\",\"elements\":[{\"name\":\"Position\",\"kid\":9964,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"RSI Series\",\"kid\":5459,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":7196,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":3044,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":2167,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}},{\"type\":\"value\",\"value\":\"20\"}]}},{\"type\":\"value\",\"value\":\"-1\"}]},{\"name\":\"<\",\"params\":[]},{\"name\":\"Number\",\"kid\":3162,\"params\":[{\"type\":\"value\",\"value\":\"50\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_3\",\"elements\":[{\"name\":\"Net Quantity\",\"kid\":5360,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Traded Instrument Name\",\"kid\":3061,\"params\":[{\"type\":\"value\",\"value\":\"Entry\"},{\"type\":\"value\",\"value\":\"instrument\"},{\"type\":\"value\",\"value\":\"NIFTY 50\"},{\"type\":\"value\",\"value\":\"2\"},{\"type\":\"value\",\"value\":\"1\"},{\"type\":\"value\",\"value\":\"1\"}]}}]},{\"name\":\"==\",\"params\":[]},{\"name\":\"Number\",\"kid\":3162,\"params\":[{\"type\":\"value\",\"value\":\"0\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_4\",\"elements\":[{\"name\":\"Net Quantity\",\"kid\":5360,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Traded Instrument Name\",\"kid\":3061,\"params\":[{\"type\":\"value\",\"value\":\"Entry\"},{\"type\":\"value\",\"value\":\"instrument\"},{\"type\":\"value\",\"value\":\"NIFTY 50\"},{\"type\":\"value\",\"value\":\"1\"},{\"type\":\"value\",\"value\":\"1\"},{\"type\":\"value\",\"value\":\"1\"}]}}]},{\"name\":\"==\",\"params\":[]},{\"name\":\"Number\",\"kid\":3162,\"params\":[{\"type\":\"value\",\"value\":\"0\"}]}]},{\"type\":\"group\",\"value\":\"builder-basic_group_6\",\"children\":{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_6\",\"elements\":[{\"name\":\"LTP\",\"kid\":6373,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":8755,\"params\":[{\"type\":\"value\",\"value\":\"NSE_IDX,INDIA VIX,,,,,\"}]}}]},{\"name\":\">\",\"params\":[]},{\"name\":\"Number\",\"kid\":6897,\"params\":[{\"type\":\"value\",\"value\":\"13\"}]}]},{\"type\":\"rule\",\"value\":\"builder-basic_rule_7\",\"elements\":[{\"name\":\"LTP\",\"kid\":6373,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":8755,\"params\":[{\"type\":\"value\",\"value\":\"NSE_IDX,INDIA VIX,,,,,\"}]}}]},{\"name\":\"<\",\"params\":[]},{\"name\":\"Number\",\"kid\":6897,\"params\":[{\"type\":\"value\",\"value\":\"20\"}]}]}]}}]}",
+          "conditionDisplay": "( Position ( Cross ( EMA ( CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) , CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) ) , '-1' ) ) and ( Time ( 'NSE' ) >= Number ( '1000' ) ) and ( Time ( 'NSE' ) <= Number ( '1445' ) ) and ( Position ( RSI Series ( CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) , '-1' ) < Number ( '50' ) ) and ( Net Quantity ( 'strategy_id', 'run_counter', Traded Instrument Name ( 'strategy_id', 'run_counter', 'Entry', 'instrument', 'NIFTY 50', '2', '1', '1' ) ) == Number ( '0' ) ) and ( Net Quantity ( 'strategy_id', 'run_counter', Traded Instrument Name ( 'strategy_id', 'run_counter', 'Entry', 'instrument', 'NIFTY 50', '1', '1', '1' ) ) == Number ( '0' ) ) and ( ( LTP ( Instrument Name ( 'NSE_IDX,INDIA VIX,,,,,' ) , 'LTP' ) > Number ( '13' ) ) and ( LTP ( Instrument Name ( 'NSE_IDX,INDIA VIX,,,,,' ) , 'LTP' ) < Number ( '20' ) ) )",
+          "subType": "None",
+          "visible": 1,
+          "legs": [
+            {
+              "instrument": 1855,
+              "list": 0,
+              "optionType": "PE",
+              "expiryType": "Current Week",
+              "expiry": "tt_curr_weekexpiry('NIFTY 50')",
+              "expiryJson": null,
+              "expiryDisplay": null,
+              "strikeType": "Fx",
+              "strike": "( tt_round ( tt_get_var ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , 'LTP' ) , '50' ) )",
+              "strikeJson": "{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_0\",\"elements\":[{\"name\":\"Round\",\"kid\":8588,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"LTP\",\"kid\":2380,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":7210,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}}]}},{\"type\":\"value\",\"value\":\"50\"}]}]}]}",
+              "strikeDisplay": "( Round ( LTP ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , 'LTP' ) , '50' ) )",
+              "qty": "tt_lots(1,'INSTRUMENT','PE')",
+              "qtyType": "Lots",
+              "qtyDisplay": "1",
+              "qtyJson": null,
+              "qtyExprDisplay": null,
+              "limitPrice": null,
+              "limitPriceDisplay": null,
+              "limitPriceJson": null,
+              "limitPriceExprDisplay": null,
+              "buySell": "B",
+              "entryLimit": null,
+              "entryTrigger": null,
+              "sLLimit": null,
+              "sLTrigger": null,
+              "sLTriggerDisplay": null,
+              "sLTriggerJson": null,
+              "sLTriggerExprDisplay": null,
+              "targetLimit": null,
+              "targetTrigger": null,
+              "productType": "NRML",
+              "underlyingSymbol": "NIFTY 50",
+              "isOvernightProtectionLeg": "No",
+              "updatedAt": "2026-07-18 17:52:38",
+              "createdAt": "2026-07-18 17:52:38"
+            }
+          ],
+          "extra": {
+            "name": null,
+            "variables": [
+              {
+                "variableName": "traded",
+                "value": "( tt_Number ( '1' )  )",
+                "display": "( Number ( '1' )  )",
+                "json": "{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_0\",\"elements\":[{\"name\":\"Number\",\"kid\":5950,\"params\":[{\"type\":\"value\",\"value\":\"1\"}]}]}]}"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Exit",
+          "conditionValue": "( tt_get_element ( tt_cross ( tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , tt_EMA ( tt_CLOSE ( tt_get_data ( tt_get_instrument ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) ) , '-1' ) )",
+          "conditionJson": "{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_1\",\"elements\":[{\"name\":\"Position\",\"kid\":6444,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Cross\",\"kid\":8422,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":8329,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":7311,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":2507,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}},{\"type\":\"keyword\",\"keyword\":{\"name\":\"EMA\",\"kid\":7454,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"CLOSE\",\"kid\":9640,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Symbol\",\"kid\":8847,\"params\":[{\"type\":\"keyword\",\"keyword\":{\"name\":\"Instrument Name\",\"kid\":5476,\"params\":[{\"type\":\"value\",\"value\":\"NFO,NIFTY 50,,,,,\"}]}},{\"type\":\"value\",\"value\":\"15m\"},{\"type\":\"value\",\"value\":\"All\"}]}}]}},{\"type\":\"value\",\"value\":\"20\"}]}}]}},{\"type\":\"value\",\"value\":\"-1\"}]}]}]}",
+          "conditionDisplay": "( Position ( Cross ( CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , EMA ( CLOSE ( Symbol ( Instrument Name ( 'NFO,NIFTY 50,,,,,' ) , '15m', 'All' ) ) , '20' ) ) , '-1' ) )",
+          "subType": "None",
+          "visible": 1,
+          "legs": [],
+          "extra": {
+            "name": null,
+            "variables": []
+          }
+        }
+      ]
+    },
+    {
+      "name": null,
+      "conditions": [
+        {
+          "type": "Repair Once",
+          "conditionValue": null,
+          "conditionJson": null,
+          "conditionDisplay": null,
+          "subType": "Overnight Protection",
+          "visible": 0,
+          "legs": [],
+          "extra": {
+            "name": null,
+            "variables": []
+          }
+        },
+        {
+          "type": "Universal Exit",
+          "conditionValue": "( tt_Time ( 'NSE' ) >= tt_Number ( '1459' ) )",
+          "conditionJson": "{\"operator\":\"and\",\"operands\":[{\"type\":\"rule\",\"value\":\"builder-basic_rule_0\",\"elements\":[{\"name\":\"Time\",\"kid\":1058,\"params\":[{\"type\":\"value\",\"value\":\"NSE\"}]},{\"name\":\">=\",\"params\":[]},{\"name\":\"Number\",\"kid\":4997,\"params\":[{\"type\":\"value\",\"value\":\"1459\"}]}]}]}",
+          "conditionDisplay": "( Time ( 'NSE' ) >= Number ( '1459' ) )",
+          "subType": "None",
+          "visible": 1,
+          "legs": [],
+          "extra": {
+            "name": null,
+            "variables": []
+          }
+        }
+      ]
+    }
+  ],
+  "currency": "INR",
+  "priceExecution": "Market Price",
+  "tranchSize": 100,
+  "tslToCostAtProfit": 0,
+  "tslProfitIncrease": 0,
+  "tslSlIncrease": 0,
+  "runFrequency": "Continuous",
+  "firstTradeAfterOpen": 300,
+  "lastTradeBeforeClose": 60,
+  "rolloverExpiryPeriod": "Dont Rollover",
+  "capitalRequired": 100000,
+  "priceRevisionAttempts": 1,
+  "tranchWaitSecs": 1,
+  "exitShortsFirst": 0,
+  "priceRevisionTimeout": 0,
+  "reactivateEvery": 360,
+  "finalAction": "MARKET",
+  "exitAtMarket": 0,
+  "runEvery": 1,
+  "rolloverExpiryTime": "1500",
+  "priceTicksMultiple": "1",
+  "pythonCode": null,
+  "isPublic": 0,
+  "minMultiple": 1,
+  "maxMultiple": 100,
+  "freePeriod": null,
+  "fixedFee": "0.00",
+  "fixedFeePeriod": "1",
+  "variableFee": "0.00",
+  "hurdleRate": 0,
+  "recreatePositionsInNewFollowers": "No",
+  "allowDuplication": 0,
+  "confirmationPerSubscriber": 0,
+  "hideSubscribers": "No",
+  "strategyPublicLinkAccess": "Yes",
+  "strategyPublicLink": null,
+  "displayPositionsToNonSubscribers": 0,
+  "highWatermark": "Yes",
+  "showLiveAutoDeployment": 0,
+  "feeShare": null,
+  "isApproved": 0,
+  "feeFrequency": "Month",
+  "backtestLinkSubscribers": null,
+  "backtestLinkNonsubscribers": null
+}
