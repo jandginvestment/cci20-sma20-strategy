@@ -120,9 +120,22 @@ export class SettingsComponent implements OnInit {
 
   addWatchlist(name: string, files: FileList | null) {
     if (!name || !files || files.length === 0) return;
-    this.watchlistService.createWatchlist(name, files[0]).subscribe(() => {
-      this.loadWatchlists();
-    });
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = (e.target?.result as string) || '';
+      // Parse CSV: split by comma/newline, clean up spaces, and remove empty elements
+      const tickers = text.split(/[\r\n,]+/)
+        .map(t => t.trim().toUpperCase())
+        .filter(t => t.length > 0);
+        
+      if (tickers.length === 0) return;
+      
+      this.watchlistService.createWatchlist(name, tickers).subscribe(() => {
+        this.loadWatchlists();
+      });
+    };
+    reader.readAsText(file);
   }
 
   confirmDelete(name: string) {
