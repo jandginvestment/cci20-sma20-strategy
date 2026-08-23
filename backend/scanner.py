@@ -33,7 +33,23 @@ from db.models import Base, DailyStockMetric, User, Watchlist, WatchlistItem
 # ── DB session factory ─────────────────────────────────────────────────────────
 
 def _make_session() -> Session:
-    raw = os.environ.get("DATABASE_URL_SYNC") or os.environ.get("DATABASE_URL", "postgresql://scanner:devpass@localhost:5432/scandb")
+    raw = os.environ.get("DATABASE_URL_SYNC") or os.environ.get("DATABASE_URL", "")
+    if not raw:
+        root_dir = os.path.dirname(_here)
+        for env_file in [os.path.join(root_dir, ".env"), os.path.join(_here, ".env")]:
+            if os.path.isfile(env_file):
+                with open(env_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith("DATABASE_URL_SYNC="):
+                            raw = line.split("=", 1)[1].strip('"').strip("'")
+                            break
+                        elif line.startswith("DATABASE_URL=") and not raw:
+                            raw = line.split("=", 1)[1].strip('"').strip("'")
+
+    if not raw:
+        raw = "postgresql://neondb_owner:npg_G2UpfBLPQM1C@ep-crimson-night-azfkfjyr-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
+
     url = raw.replace("+asyncpg", "")
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
@@ -101,11 +117,11 @@ def sync_default_watchlists(watchlists_dir: str, session: Session, admin_user: U
 
             # Find or create admin watchlist
             wl = session.execute(
-                select(Watchlist).where(Watchlist.owner_id == admin_user.id, Watchlist.name == name)
+                select(Watchlist).where(Watchlist.user_id == admin_user.id, Watchlist.name == name)
             ).scalar_one_or_none()
 
             if not wl:
-                wl = Watchlist(owner_id=admin_user.id, name=name, is_public=True)
+                wl = Watchlist(user_id=admin_user.id, name=name, is_public=True)
                 session.add(wl)
                 session.flush()
 

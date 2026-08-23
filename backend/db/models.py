@@ -57,11 +57,11 @@ class Watchlist(Base):
     """A named watchlist owned by a user with a unique share_id for syncing across users."""
     __tablename__ = "watchlists"
     __table_args__ = (
-        UniqueConstraint("owner_id", "name", name="uq_watchlist_owner_name"),
+        UniqueConstraint("user_id", "name", name="uq_watchlist_user_name"),
     )
 
-    id          = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    owner_id    = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
+    id          = Column(Integer, primary_key=True, autoincrement=True)
+    user_id     = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
                          nullable=False, index=True)
     name        = Column(String(100), nullable=False)
     description = Column(String(255), nullable=True)
@@ -77,6 +77,10 @@ class Watchlist(Base):
     subscribers = relationship("UserSubscription", back_populates="watchlist", cascade="all, delete-orphan")
     scan_runs   = relationship("ScanRun", back_populates="watchlist", cascade="all, delete-orphan")
 
+    @property
+    def owner_id(self):
+        return self.user_id
+
 
 # ── Watchlist Items ─────────────────────────────────────────────────────────────
 
@@ -89,7 +93,7 @@ class WatchlistItem(Base):
     )
 
     id           = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    watchlist_id = Column(UUID(as_uuid=True), ForeignKey("watchlists.id", ondelete="CASCADE"), nullable=False)
+    watchlist_id = Column(Integer, ForeignKey("watchlists.id", ondelete="CASCADE"), nullable=False)
     ticker       = Column(String(20), nullable=False)
     added_at     = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -107,7 +111,7 @@ class UserSubscription(Base):
 
     id           = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id      = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    watchlist_id = Column(UUID(as_uuid=True), ForeignKey("watchlists.id", ondelete="CASCADE"), nullable=False)
+    watchlist_id = Column(Integer, ForeignKey("watchlists.id", ondelete="CASCADE"), nullable=False)
     subscribed_at= Column(DateTime(timezone=True), server_default=func.now())
 
     user         = relationship("User", back_populates="subscriptions")

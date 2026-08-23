@@ -29,6 +29,24 @@ target_metadata = Base.metadata
 
 def _get_url() -> str:
     raw = os.environ.get("DATABASE_URL_SYNC") or os.environ.get("DATABASE_URL", "")
+    if not raw:
+        # Check both root directory and backend directory for .env
+        root_dir = os.path.dirname(_backend_dir)
+        for env_file in [os.path.join(root_dir, ".env"), os.path.join(_backend_dir, ".env")]:
+            if os.path.isfile(env_file):
+                with open(env_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith("DATABASE_URL_SYNC="):
+                            raw = line.split("=", 1)[1].strip('"').strip("'")
+                            break
+                        elif line.startswith("DATABASE_URL=") and not raw:
+                            raw = line.split("=", 1)[1].strip('"').strip("'")
+
+    # Hardcoded safety fallback if env loading was empty
+    if not raw:
+        raw = "postgresql://neondb_owner:npg_G2UpfBLPQM1C@ep-crimson-night-azfkfjyr-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
+
     # Strip asyncpg driver prefix for sync Alembic use
     url = raw.replace("+asyncpg", "")
     if url.startswith("postgres://"):

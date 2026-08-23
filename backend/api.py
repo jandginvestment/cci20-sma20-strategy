@@ -380,10 +380,9 @@ async def trigger_scan(current_user: User = Depends(get_current_user)):
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 async def _get_owned_watchlist(watchlist_id: str, user: User, db: AsyncSession) -> Watchlist:
-    try:
-        wl_uuid = uuid.UUID(watchlist_id)
-        stmt = select(Watchlist).where(Watchlist.id == wl_uuid, Watchlist.owner_id == user.id)
-    except ValueError:
+    if watchlist_id.isdigit():
+        stmt = select(Watchlist).where(Watchlist.id == int(watchlist_id), Watchlist.owner_id == user.id)
+    else:
         stmt = select(Watchlist).where(Watchlist.name == watchlist_id, Watchlist.owner_id == user.id)
 
     res = await db.execute(stmt)
@@ -394,16 +393,13 @@ async def _get_owned_watchlist(watchlist_id: str, user: User, db: AsyncSession) 
 
 
 async def _resolve_watchlist(identifier: str, user: User, db: AsyncSession) -> Watchlist:
-    """Resolve watchlist by UUID, Share ID, or Name."""
-    # 1. By UUID
-    try:
-        wl_uuid = uuid.UUID(identifier)
-        res = await db.execute(select(Watchlist).where(Watchlist.id == wl_uuid))
+    """Resolve watchlist by Integer ID, Share ID, or Name."""
+    # 1. By Integer ID
+    if identifier.isdigit():
+        res = await db.execute(select(Watchlist).where(Watchlist.id == int(identifier)))
         wl = res.scalar_one_or_none()
         if wl:
             return wl
-    except ValueError:
-        pass
 
     # 2. By Share ID
     if identifier.startswith("sh_"):
