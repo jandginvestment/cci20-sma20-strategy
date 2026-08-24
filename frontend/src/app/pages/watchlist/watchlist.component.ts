@@ -57,8 +57,8 @@ import { DecimalPipe } from '@angular/common';
               </div>
             } @else {
               <div class="table-responsive">
-                <table>
-                  <thead>
+                <table class="table table-striped table-hover align-middle mb-0">
+                  <thead class="table-group-divider">
                     <tr>
                       <th>Ticker</th>
                       <th>Signal</th>
@@ -75,7 +75,7 @@ import { DecimalPipe } from '@angular/common';
                   <tbody>
                     @for (row of filteredResults(); track row.ticker) {
                       <tr>
-                        <td class="font-medium">{{ row.ticker }}</td>
+                        <td class="fw-medium">{{ row.ticker }}</td>
                         <td><app-signal-badge [type]="getSignalType(row)"></app-signal-badge></td>
                         <td>{{ row.close | number:'1.2-2' }}</td>
                         <td [class.text-success]="row.cci_20 > 0" [class.text-danger]="row.cci_20 < 0">{{ row.cci_20 | number:'1.2-2' }}</td>
@@ -108,35 +108,39 @@ import { DecimalPipe } from '@angular/common';
   `,
   styles: [`
     .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; }
-    h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }
-    .subtitle { color: var(--text-secondary); font-size: 0.875rem; }
+    .subtitle { color: var(--bs-secondary-color); font-size: 0.875rem; margin-top: 0.5rem; }
     
-    .filters { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
-    .filter-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .chip { 
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-      color: var(--text-secondary); padding: 0.375rem 1rem; border-radius: 9999px; 
-      font-size: 0.875rem; cursor: pointer; transition: all 0.2s; 
+    .filters { margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1rem; }
+    .filter-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    
+    .chip {
+      background: transparent;
+      border: 1px solid var(--bs-border-color);
+      color: var(--bs-body-color);
+      padding: 0.375rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .chip:hover { background: rgba(255,255,255,0.1); color: var(--text-primary); }
-    .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-    .chip.active.chip-reversal { background: var(--danger); border-color: var(--danger); }
-    .chip.active.chip-recovery { background: var(--warning); border-color: var(--warning); color: #000; }
-    .chip.active.chip-momentum { background: var(--success); border-color: var(--success); }
-    .chip.active.chip-overbought { background: var(--purple); border-color: var(--purple); }
+    .chip:hover {
+      background: var(--bs-tertiary-bg);
+    }
+    .chip.active {
+      background: var(--bs-primary);
+      color: #fff;
+      border-color: var(--bs-primary);
+    }
+    .chip-reversal.active { background: var(--bs-danger); border-color: var(--bs-danger); }
+    .chip-recovery.active { background: var(--bs-warning); border-color: var(--bs-warning); color: #000; }
+    .chip-momentum.active { background: var(--bs-success); border-color: var(--bs-success); }
+    .chip-overbought.active { background: var(--bs-purple, #6f42c1); border-color: var(--bs-purple, #6f42c1); }
+
+    .table-card { overflow: hidden; padding: 0; }
     
-    .table-card { padding: 0; overflow: hidden; }
-    .table-responsive { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th, td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-glow); white-space: nowrap; }
-    th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 600; background: rgba(0,0,0,0.2); }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
-    .font-medium { font-weight: 500; color: var(--text-primary); }
-    .text-success { color: var(--success); }
-    .text-danger { color: var(--danger); }
-    .tv-link { color: var(--text-secondary); }
-    .tv-link:hover { color: var(--accent); }
+    .tv-link { color: var(--bs-secondary-color); transition: color 0.2s; }
+    .tv-link:hover { color: var(--bs-primary); }
     
     .skeleton-table { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
     .skeleton-row { height: 40px; border-radius: 4px; }

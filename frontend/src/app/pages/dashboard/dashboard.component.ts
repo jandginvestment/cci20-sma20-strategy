@@ -18,7 +18,7 @@ import { DatePipe } from '@angular/common';
         <main class="page-container">
           <div class="header-row">
             <h1>Dashboard</h1>
-            <button class="btn-primary" (click)="triggerScan()" [disabled]="scanning()">
+            <button class="btn btn-primary" (click)="triggerScan()" [disabled]="scanning()">
               @if (scanning()) {
                 <div class="spinner"></div> Scanning...
               } @else {
@@ -43,7 +43,7 @@ import { DatePipe } from '@angular/common';
             </div>
             <div class="card stat-card">
               <div class="stat-label">Near Weekly Low</div>
-              <div class="stat-value text-accent">{{ weeklyLow() }}</div>
+              <div class="stat-value text-primary">{{ weeklyLow() }}</div>
             </div>
           </div>
 
@@ -97,18 +97,16 @@ import { DatePipe } from '@angular/common';
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
+      padding: 1.5rem;
     }
     .stat-label {
       font-size: 0.875rem;
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
     }
     .stat-value {
       font-size: 2rem;
       font-weight: 700;
     }
-    .text-success { color: var(--success); }
-    .text-warning { color: var(--warning); }
-    .text-accent { color: var(--accent); }
     .watchlist-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -116,9 +114,11 @@ import { DatePipe } from '@angular/common';
     }
     .wl-card {
       cursor: pointer;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
     }
     .wl-card:hover {
-      border-color: var(--accent);
+      border-color: var(--bs-primary);
       transform: translateY(-2px);
     }
     .wl-header {
@@ -133,7 +133,7 @@ import { DatePipe } from '@angular/common';
     }
     .date {
       font-size: 0.75rem;
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
     }
     .wl-body {
       display: flex;
@@ -146,7 +146,7 @@ import { DatePipe } from '@angular/common';
     }
     .wl-stat span {
       font-size: 0.75rem;
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
     }
     .wl-stat strong {
       font-size: 1rem;

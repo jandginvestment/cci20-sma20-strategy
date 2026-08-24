@@ -10,15 +10,15 @@ import { AuthService } from '../../core/auth/auth.service';
       <div class="card login-card">
         <div class="logo">
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="8" fill="var(--accent)" fill-opacity="0.2"/>
-            <path d="M10 28L18 16L24 22L30 12" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="30" cy="12" r="3" fill="var(--accent)"/>
+            <rect width="40" height="40" rx="8" fill="var(--bs-primary)" fill-opacity="0.2"/>
+            <path d="M10 28L18 16L24 22L30 12" stroke="var(--bs-primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="30" cy="12" r="3" fill="var(--bs-primary)"/>
           </svg>
         </div>
         <h1>CCI/SMA Scanner</h1>
         <p class="subtitle">Institutional-grade CCI(20) + SMA(20) signals for Indian equities</p>
         
-        <button class="btn-primary login-btn" (click)="login()">
+        <button class="btn btn-primary login-btn" (click)="login()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 3H21V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M9 21H3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -42,7 +42,7 @@ import { AuthService } from '../../core/auth/auth.service';
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: var(--bg-primary);
+      background: var(--bs-body-bg);
     }
     
     .bg-animation {
@@ -80,13 +80,13 @@ import { AuthService } from '../../core/auth/auth.service';
       font-size: 1.75rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
-      background: linear-gradient(to right, #fff, var(--text-secondary));
+      background: linear-gradient(to right, #fff, var(--bs-secondary-color));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     
     .subtitle {
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
       font-size: 0.875rem;
       line-height: 1.5;
       margin-bottom: 2.5rem;
@@ -97,11 +97,15 @@ import { AuthService } from '../../core/auth/auth.service';
       font-size: 1rem;
       padding: 0.875rem;
       margin-bottom: 2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
     
     .footer {
       font-size: 0.75rem;
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
       opacity: 0.7;
     }
   `]

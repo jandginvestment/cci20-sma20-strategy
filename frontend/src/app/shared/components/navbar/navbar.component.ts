@@ -12,9 +12,9 @@ import { AuthService } from '../../../core/auth/auth.service';
       <div class="nav-brand" routerLink="/">
         <div class="logo">
           <svg width="24" height="24" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="8" fill="var(--accent)" fill-opacity="0.2"/>
-            <path d="M10 28L18 16L24 22L30 12" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="30" cy="12" r="3" fill="var(--accent)"/>
+            <rect width="40" height="40" rx="8" fill="var(--bs-primary)" fill-opacity="0.2"/>
+            <path d="M10 28L18 16L24 22L30 12" stroke="var(--bs-primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="30" cy="12" r="3" fill="var(--bs-primary)"/>
           </svg>
         </div>
         <span class="brand-text">CCI/SMA Scanner</span>
@@ -43,8 +43,8 @@ import { AuthService } from '../../../core/auth/auth.service';
   styles: [`
     .navbar {
       height: 64px;
-      border-bottom: 1px solid var(--border-glow);
-      background: rgba(10, 14, 26, 0.8);
+      border-bottom: 1px solid var(--bs-border-color);
+      background: rgba(var(--bs-body-bg-rgb), 0.8);
       backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
@@ -61,7 +61,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     .brand-text {
       font-weight: 600;
       font-size: 1.125rem;
-      color: var(--text-primary);
+      color: var(--bs-body-color);
     }
     .nav-actions {
       display: flex;
@@ -69,12 +69,12 @@ import { AuthService } from '../../../core/auth/auth.service';
       gap: 1.5rem;
     }
     .icon-btn {
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
       transition: color 0.2s ease;
       display: flex;
     }
     .icon-btn:hover {
-      color: var(--accent);
+      color: var(--bs-primary);
     }
     .user-profile {
       display: flex;
@@ -85,7 +85,7 @@ import { AuthService } from '../../../core/auth/auth.service';
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: var(--accent);
+      background: var(--bs-primary);
       color: #fff;
       display: flex;
       align-items: center;
@@ -95,7 +95,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     }
     .user-email {
       font-size: 0.875rem;
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
       max-width: 150px;
       white-space: nowrap;
       overflow: hidden;

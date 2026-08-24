@@ -44,8 +44,8 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
   styles: [`
     .sidebar {
       width: 260px;
-      background: var(--bg-card);
-      border-right: 1px solid var(--border-glow);
+      background: var(--bs-tertiary-bg);
+      border-right: 1px solid var(--bs-border-color);
       display: flex;
       flex-direction: column;
       transition: width 0.3s ease;
@@ -60,12 +60,12 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       display: flex;
       align-items: center;
       padding: 0 1.5rem;
-      border-bottom: 1px solid var(--border-glow);
+      border-bottom: 1px solid var(--bs-border-color);
     }
     .toggle-btn {
       background: transparent;
       border: none;
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -76,8 +76,8 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       border-radius: 6px;
     }
     .toggle-btn:hover {
-      background: rgba(255,255,255,0.05);
-      color: var(--text-primary);
+      background: var(--bs-secondary-bg);
+      color: var(--bs-body-color);
     }
     .sidebar.collapsed .sidebar-header {
       padding: 0;
@@ -103,7 +103,7 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
     .section-title {
       font-size: 0.75rem;
       font-weight: 600;
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
       padding: 0 1rem;
       margin-bottom: 0.5rem;
       opacity: 1;
@@ -117,19 +117,19 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       align-items: center;
       gap: 1rem;
       padding: 0.75rem 1rem;
-      color: var(--text-secondary);
+      color: var(--bs-secondary-color);
       text-decoration: none;
       border-radius: 8px;
       transition: all 0.2s ease;
     }
     .nav-item:hover {
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--accent);
+      background: rgba(var(--bs-primary-rgb), 0.1);
+      color: var(--bs-primary);
     }
     .nav-item.active {
-      background: rgba(59, 130, 246, 0.15);
-      color: var(--accent);
-      border: 1px solid rgba(59, 130, 246, 0.2);
+      background: rgba(var(--bs-primary-rgb), 0.15);
+      color: var(--bs-primary);
+      border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
     }
     .nav-icon {
       flex-shrink: 0;
