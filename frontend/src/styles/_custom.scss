@@ -71,6 +71,85 @@
 .badge-mo  { background: rgba($warning,  0.18); color: #fcd34d; border: 1px solid rgba($warning, 0.3); }
 .badge-wk  { background: rgba($primary,  0.18); color: #a5b4fc; border: 1px solid rgba($primary, 0.3); }
 
+// ── Signal badges (used by SignalBadgeComponent) ───────────
+.badge-reversal  { display:inline-flex; align-items:center; gap:4px; background:rgba($danger,  0.15); color:#fca5a5; border:1px solid rgba($danger, 0.3);  padding:.28em .65em; border-radius:$border-radius-pill; font-size:.75rem; font-weight:600; }
+.badge-recovery  { display:inline-flex; align-items:center; gap:4px; background:rgba($warning, 0.15); color:#fcd34d; border:1px solid rgba($warning,0.3); padding:.28em .65em; border-radius:$border-radius-pill; font-size:.75rem; font-weight:600; }
+.badge-momentum  { display:inline-flex; align-items:center; gap:4px; background:rgba($success, 0.15); color:#6ee7b7; border:1px solid rgba($success,0.3); padding:.28em .65em; border-radius:$border-radius-pill; font-size:.75rem; font-weight:600; }
+.badge-overbought{ display:inline-flex; align-items:center; gap:4px; background:rgba($primary, 0.15); color:#a5b4fc; border:1px solid rgba($primary,0.3); padding:.28em .65em; border-radius:$border-radius-pill; font-size:.75rem; font-weight:600; }
+.badge-neutral   { display:inline-flex; align-items:center; gap:4px; background:rgba($secondary,0.15); color:#94a3b8; border:1px solid rgba($secondary,0.3); padding:.28em .65em; border-radius:$border-radius-pill; font-size:.75rem; font-weight:600; }
+
+// ── Signal filter chips ────────────────────────────────────
+.sig-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.3rem 0.85rem;
+  border-radius: $border-radius-pill;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: $secondary;
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  &:hover { border-color: rgba(255,255,255,0.22); color: $light; background: rgba(255,255,255,0.05); }
+  &.active { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); color: $light; }
+
+  &.sig-reversal  { color: #fca5a5; &:hover, &.active { background: rgba($danger,  0.12); border-color: rgba($danger,  0.4); } }
+  &.sig-recovery  { color: #fcd34d; &:hover, &.active { background: rgba($warning, 0.12); border-color: rgba($warning, 0.4); } }
+  &.sig-momentum  { color: #6ee7b7; &:hover, &.active { background: rgba($success, 0.12); border-color: rgba($success, 0.4); } }
+  &.sig-overbought{ color: #a5b4fc; &:hover, &.active { background: rgba($primary, 0.12); border-color: rgba($primary, 0.4); } }
+}
+
+// ── Stat cards ─────────────────────────────────────────────
+.stat-card {
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  transition: all 0.2s ease;
+
+  &:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
+  &.stat-active { border-color: rgba($primary, 0.5) !important; box-shadow: 0 0 0 1px rgba($primary, 0.25); }
+  &.stat-active-yr { border-color: rgba($danger,  0.5) !important; box-shadow: 0 0 0 1px rgba($danger,  0.2); }
+  &.stat-active-mo { border-color: rgba($warning, 0.5) !important; box-shadow: 0 0 0 1px rgba($warning, 0.2); }
+  &.stat-active-wk { border-color: rgba($primary, 0.5) !important; box-shadow: 0 0 0 1px rgba($primary, 0.2); }
+
+  .stat-num  { font-size: 1.75rem; font-weight: 700; color: #f8fafc; line-height: 1; }
+  .stat-lbl  { font-size: 0.78rem; color: $secondary; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+}
+
+// ── Sortable column headers ────────────────────────────────
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+
+  &:hover { color: #e2e8f0 !important; }
+  &.th-active { color: #a5b4fc !important; }
+}
+
+.sort-icon {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 0.72rem;
+  opacity: 0.45;
+  .th-active & { opacity: 1; color: #a5b4fc; }
+}
+
+// ── Row signal left-border tint ────────────────────────────
+.scanner-table tbody {
+  .row-sig-reversal   { background: rgba($danger,   0.04) !important; }
+  .row-sig-recovery   { background: rgba($warning,  0.04) !important; }
+  .row-sig-momentum   { background: rgba($success,  0.04) !important; }
+  .row-sig-overbought { background: rgba($primary,  0.04) !important; }
+
+  .row-sig-reversal   td:first-child { border-left: 3px solid rgba($danger,   0.5); }
+  .row-sig-recovery   td:first-child { border-left: 3px solid rgba($warning,  0.5); }
+  .row-sig-momentum   td:first-child { border-left: 3px solid rgba($success,  0.5); }
+  .row-sig-overbought td:first-child { border-left: 3px solid rgba($primary,  0.5); }
+}
+
 // ── Table tweaks ──────────────────────────────────────────
 .scanner-table {
   font-size: 0.875rem;
