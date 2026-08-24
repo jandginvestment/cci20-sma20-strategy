@@ -67,9 +67,9 @@
 }
 
 // ── Badge colour helpers ───────────────────────────────────
-.badge-yr  { background: rgba($danger,   0.18); color: lighten($danger,   20%);  border: 1px solid rgba($danger,  0.3); }
-.badge-mo  { background: rgba($warning,  0.18); color: lighten($warning,  15%); border: 1px solid rgba($warning, 0.3); }
-.badge-wk  { background: rgba($primary,  0.18); color: lighten($primary,  25%); border: 1px solid rgba($primary, 0.3); }
+.badge-yr  { background: rgba($danger,   0.18); color: #fca5a5; border: 1px solid rgba($danger,  0.3); }
+.badge-mo  { background: rgba($warning,  0.18); color: #fcd34d; border: 1px solid rgba($warning, 0.3); }
+.badge-wk  { background: rgba($primary,  0.18); color: #a5b4fc; border: 1px solid rgba($primary, 0.3); }
 
 // ── Table tweaks ──────────────────────────────────────────
 .scanner-table {
