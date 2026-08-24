@@ -41,68 +41,71 @@ import { AuthService } from '../../../core/auth/auth.service';
     </nav>
   `,
   styles: [`
+    :host { display: contents; }
+
     .navbar {
       height: 64px;
-      border-bottom: 1px solid var(--bs-border-color);
-      background: rgba(var(--bs-body-bg-rgb), 0.8);
-      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: rgba(13, 21, 38, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 2rem;
+      padding: 0 1.5rem;
+      flex-shrink: 0;
+      z-index: 100;
     }
     .nav-brand {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.65rem;
       cursor: pointer;
       text-decoration: none;
     }
+    .logo {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 10px rgba(99,102,241,0.35);
+    }
     .brand-text {
-      font-weight: 600;
-      font-size: 1.125rem;
-      color: var(--bs-body-color);
+      font-weight: 700;
+      font-size: 1rem;
+      color: #f8fafc;
+      letter-spacing: 0.01em;
     }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
+    .nav-center { flex: 1; display: flex; justify-content: center; }
+    .nav-actions { display: flex; align-items: center; gap: 1rem; }
+
     .icon-btn {
-      color: var(--bs-secondary-color);
-      transition: color 0.2s ease;
+      color: #64748b;
+      transition: color 0.2s;
       display: flex;
+      padding: 0.35rem;
+      border-radius: 6px;
     }
-    .icon-btn:hover {
-      color: var(--bs-primary);
-    }
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
+    .icon-btn:hover { color: #a5b4fc; background: rgba(99,102,241,0.1); }
+
+    .user-profile { display: flex; align-items: center; gap: 0.65rem; }
     .avatar {
-      width: 32px;
-      height: 32px;
+      width: 32px; height: 32px;
       border-radius: 50%;
-      background: var(--bs-primary);
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
       color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.875rem;
-      font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
     }
     .user-email {
-      font-size: 0.875rem;
-      color: var(--bs-secondary-color);
-      max-width: 150px;
+      font-size: 0.82rem;
+      color: #64748b;
+      max-width: 140px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-    .btn-sm {
-      padding: 0.375rem 0.5rem;
     }
   `]
 })

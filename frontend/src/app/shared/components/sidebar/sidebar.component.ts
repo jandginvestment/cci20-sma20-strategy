@@ -8,148 +8,184 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
   imports: [RouterModule],
   template: `
     <aside class="sidebar" [class.collapsed]="collapsed()">
+
+      <!-- Logo + toggle -->
       <div class="sidebar-header">
-        <button class="toggle-btn" (click)="toggle()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+        <div class="logo-box" [class.d-none]="collapsed()">
+          <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
+            <path d="M6 30L16 14L24 22L34 8" stroke="white" stroke-width="3.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="34" cy="8" r="4" fill="white"/>
+          </svg>
+        </div>
+        <span class="brand-name" [class.d-none]="collapsed()">CCI/SMA</span>
+        <button class="toggle-btn ms-auto" (click)="toggle()" title="Toggle sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6"  x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
       </div>
 
-      <div class="sidebar-nav">
-        <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
-          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+
+        <!-- Dashboard -->
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-item" title="Dashboard">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
           <span class="nav-label">Dashboard</span>
         </a>
 
-        <div class="nav-section">
-          <div class="section-title">WATCHLISTS</div>
-          @for (wl of watchlists(); track wl.id) {
-            <a [routerLink]="['/watchlist', wl.name]" routerLinkActive="active" class="nav-item">
-              <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              <span class="nav-label">{{ wl.name }}</span>
-            </a>
-          }
-        </div>
+        <!-- Watchlists section -->
+        <div class="section-title" [class.d-none]="collapsed()">WATCHLISTS</div>
+
+        @for (wl of watchlists(); track wl.id) {
+          <a [routerLink]="['/watchlist', wl.name]" routerLinkActive="active"
+             class="nav-item" [title]="wl.name">
+            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span class="nav-label">{{ wl.name }}</span>
+          </a>
+        }
 
         <div class="nav-spacer"></div>
 
-        <a routerLink="/settings" routerLinkActive="active" class="nav-item">
-          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <!-- Settings -->
+        <a routerLink="/settings" routerLinkActive="active" class="nav-item" title="Settings">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06
+                     a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09
+                     A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83
+                     l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
+                     A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83
+                     l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09
+                     a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83
+                     l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
+                     a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
           <span class="nav-label">Settings</span>
         </a>
-      </div>
+
+      </nav>
     </aside>
   `,
   styles: [`
+    :host { display: contents; }
+
     .sidebar {
-      width: 260px;
-      background: var(--bs-tertiary-bg);
-      border-right: 1px solid var(--bs-border-color);
+      width: 240px;
+      min-width: 240px;
+      height: 100vh;
+      background: #0d1526;
+      border-right: 1px solid rgba(255,255,255,0.07);
       display: flex;
       flex-direction: column;
-      transition: width 0.3s ease;
+      transition: width 0.28s cubic-bezier(0.4,0,0.2,1),
+                  min-width 0.28s cubic-bezier(0.4,0,0.2,1);
       overflow-x: hidden;
-      white-space: nowrap;
+      overflow-y: auto;
     }
-    .sidebar.collapsed {
-      width: 72px;
-    }
+    .sidebar.collapsed { width: 64px; min-width: 64px; }
+
+    /* Header */
     .sidebar-header {
-      height: 64px;
       display: flex;
       align-items: center;
-      padding: 0 1.5rem;
-      border-bottom: 1px solid var(--bs-border-color);
+      gap: 0.75rem;
+      height: 64px;
+      padding: 0 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      flex-shrink: 0;
+    }
+    .logo-box {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(99,102,241,0.4);
+    }
+    .brand-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #f8fafc;
+      white-space: nowrap;
     }
     .toggle-btn {
       background: transparent;
       border: none;
-      color: var(--bs-secondary-color);
+      color: #64748b;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      margin-left: -4px;
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px;
       border-radius: 6px;
+      flex-shrink: 0;
+      transition: background 0.18s, color 0.18s;
     }
-    .toggle-btn:hover {
-      background: var(--bs-secondary-bg);
-      color: var(--bs-body-color);
-    }
-    .sidebar.collapsed .sidebar-header {
-      padding: 0;
-      justify-content: center;
-    }
-    .sidebar.collapsed .toggle-btn {
-      margin-left: 0;
-    }
+    .toggle-btn:hover { background: rgba(255,255,255,0.07); color: #e2e8f0; }
+
+    /* Nav */
     .sidebar-nav {
-      padding: 1.5rem 1rem;
+      padding: 1rem 0.75rem;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 2px;
       flex: 1;
-      overflow-y: auto;
-    }
-    .nav-section {
-      margin-top: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
     }
     .section-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--bs-secondary-color);
-      padding: 0 1rem;
-      margin-bottom: 0.5rem;
-      opacity: 1;
-      transition: opacity 0.2s;
-    }
-    .sidebar.collapsed .section-title {
-      opacity: 0;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #475569;
+      padding: 0.75rem 0.75rem 0.25rem;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 0.75rem 1rem;
-      color: var(--bs-secondary-color);
+      gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      color: #94a3b8;
       text-decoration: none;
       border-radius: 8px;
-      transition: all 0.2s ease;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background 0.18s, color 0.18s;
+      white-space: nowrap;
+      overflow: hidden;
     }
     .nav-item:hover {
-      background: rgba(var(--bs-primary-rgb), 0.1);
-      color: var(--bs-primary);
+      background: rgba(99,102,241,0.1);
+      color: #a5b4fc;
     }
     .nav-item.active {
-      background: rgba(var(--bs-primary-rgb), 0.15);
-      color: var(--bs-primary);
-      border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+      background: rgba(99,102,241,0.18);
+      color: #a5b4fc;
+      border: 1px solid rgba(99,102,241,0.25);
     }
-    .nav-icon {
-      flex-shrink: 0;
-    }
-    .nav-label {
-      font-weight: 500;
-      opacity: 1;
-      transition: opacity 0.2s;
-    }
-    .sidebar.collapsed .nav-label {
-      opacity: 0;
-      display: none;
-    }
-    .sidebar.collapsed .nav-item {
-      justify-content: center;
-      padding: 0.75rem 0;
-    }
-    .nav-spacer {
-      flex: 1;
-    }
+    .nav-icon { flex-shrink: 0; }
+
+    .nav-label { transition: opacity 0.2s; }
+    .sidebar.collapsed .nav-label { opacity: 0; width: 0; overflow: hidden; }
+    .sidebar.collapsed .nav-item { justify-content: center; padding: 0.65rem 0; }
+    .sidebar.collapsed .section-title { opacity: 0; }
+
+    .nav-spacer { flex: 1; min-height: 1rem; }
   `]
 })
 export class SidebarComponent implements OnInit {
