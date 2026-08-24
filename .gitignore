@@ -46,3 +46,9 @@ docker-compose.override.yml
 # Alembic local state
 backend/db/migrations/versions/*.pyc
 *.msi
+
+# Local scratch / deploy artifacts
+*.zip
+*.csv
+response.json
+zip_it.py
