@@ -45,8 +45,8 @@ import { AuthService } from '../../../core/auth/auth.service';
 
     .navbar {
       height: 64px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      background: rgba(13, 21, 38, 0.85);
+      border-bottom: 1px solid rgba(245,158,11,0.12);
+      background: rgba(20, 18, 12, 0.9);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       display: flex;
@@ -66,34 +66,34 @@ import { AuthService } from '../../../core/auth/auth.service';
     .logo {
       width: 34px; height: 34px;
       border-radius: 9px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      background: linear-gradient(135deg, #F59E0B, #D97706);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 10px rgba(99,102,241,0.35);
+      box-shadow: 0 3px 10px rgba(245,158,11,0.35);
     }
     .brand-text {
       font-weight: 700;
       font-size: 1rem;
-      color: #f8fafc;
+      color: #EDE4D8;
       letter-spacing: 0.01em;
     }
     .nav-center { flex: 1; display: flex; justify-content: center; }
     .nav-actions { display: flex; align-items: center; gap: 1rem; }
 
     .icon-btn {
-      color: #64748b;
-      transition: color 0.2s;
+      color: #817569;
+      transition: color 0.2s, background 0.2s;
       display: flex;
       padding: 0.35rem;
       border-radius: 6px;
     }
-    .icon-btn:hover { color: #a5b4fc; background: rgba(99,102,241,0.1); }
+    .icon-btn:hover { color: #F59E0B; background: rgba(245,158,11,0.1); }
 
     .user-profile { display: flex; align-items: center; gap: 0.65rem; }
     .avatar {
       width: 32px; height: 32px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff;
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: #141210;
       display: flex; align-items: center; justify-content: center;
       font-size: 0.8rem;
       font-weight: 700;
@@ -101,7 +101,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     }
     .user-email {
       font-size: 0.82rem;
-      color: #64748b;
+      color: #817569;
       max-width: 140px;
       white-space: nowrap;
       overflow: hidden;

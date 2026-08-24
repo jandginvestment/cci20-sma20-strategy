@@ -1,30 +1,31 @@
 // ============================================================
 //  Bootstrap Theme Overrides — CCI20/SMA20 Stock Screener
-//  Dark financial dashboard palette
+//  Warm dark theme: amber primary · cyan accent · dark brown bg
 // ============================================================
 
 // ── Colour palette ─────────────────────────────────────────
-$primary:              #6366f1;   // Indigo
-$secondary:            #64748b;   // Slate
+$primary:              #F59E0B;   // Amber
+$secondary:            #B7C8E1;   // Blue-gray
 $success:              #10b981;   // Emerald
-$info:                 #38bdf8;   // Sky
-$warning:              #f59e0b;   // Amber
+$info:                 #19BDFF;   // Cyan
+$warning:              #FBBF24;   // Yellow-amber
 $danger:               #ef4444;   // Red
-$light:                #e2e8f0;
-$dark:                 #0f172a;
+$light:                #E8DDD0;   // Warm cream
+$dark:                 #141210;   // Dark warm brown
 
 // ── Body / Layout ──────────────────────────────────────────
-$body-bg:              #0f172a;
-$body-color:           #e2e8f0;
-$body-emphasis-color:  #f8fafc;
+$body-bg:              #141210;   // Very dark warm brown
+$body-color:           #D4C8B8;  // Warm off-white
+$body-emphasis-color:  #EDE4D8;
 
 // ── Typography ─────────────────────────────────────────────
 $font-family-sans-serif: 'Inter', system-ui, -apple-system, sans-serif;
-$font-size-base:         0.9375rem;  // 15px
+$font-family-monospace:  'JetBrains Mono', 'Fira Code', monospace;
+$font-size-base:         0.9375rem;
 $line-height-base:       1.6;
 
 $headings-font-weight:   700;
-$headings-color:         #f8fafc;
+$headings-color:         #EDE4D8;
 
 // ── Border radius ──────────────────────────────────────────
 $border-radius:          0.5rem;
@@ -34,8 +35,8 @@ $border-radius-xl:       1rem;
 $border-radius-pill:     50rem;
 
 // ── Cards ──────────────────────────────────────────────────
-$card-bg:               rgba(30, 41, 59, 0.6);
-$card-border-color:     rgba(255, 255, 255, 0.08);
+$card-bg:               rgba(38, 30, 20, 0.75);
+$card-border-color:     rgba(245, 158, 11, 0.12);
 $card-border-radius:    $border-radius-xl;
 $card-spacer-x:         1.5rem;
 $card-spacer-y:         1.5rem;
@@ -43,9 +44,9 @@ $card-spacer-y:         1.5rem;
 // ── Tables ─────────────────────────────────────────────────
 $table-color:            $body-color;
 $table-bg:               transparent;
-$table-border-color:     rgba(255, 255, 255, 0.07);
-$table-striped-bg:       rgba(255, 255, 255, 0.025);
-$table-hover-bg:         rgba(255, 255, 255, 0.045);
+$table-border-color:     rgba(245, 158, 11, 0.1);
+$table-striped-bg:       rgba(245, 158, 11, 0.03);
+$table-hover-bg:         rgba(245, 158, 11, 0.06);
 $table-th-font-weight:   600;
 
 // ── Badges ─────────────────────────────────────────────────
@@ -63,7 +64,7 @@ $btn-font-weight:        500;
 $navbar-dark-color:          rgba(255,255,255,0.75);
 $navbar-dark-active-color:   #fff;
 
-// ── Grid breakpoints (unchanged, just explicit) ─────────────
+// ── Grid breakpoints (unchanged) ───────────────────────────
 $grid-breakpoints: (
   xs: 0,
   sm: 576px,

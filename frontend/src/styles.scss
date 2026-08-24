@@ -11,6 +11,9 @@
 :root {
   --text-primary:   #{$body-emphasis-color};
   --text-secondary: #{$secondary};
+  --amber:          #F59E0B;
+  --amber-dim:      #D97706;
+  --cyan:           #19BDFF;
 }
 
 // ── Base layout shell (used across all pages) ──────────────────

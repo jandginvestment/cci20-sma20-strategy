@@ -90,8 +90,8 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       width: 240px;
       min-width: 240px;
       height: 100vh;
-      background: #0d1526;
-      border-right: 1px solid rgba(255,255,255,0.07);
+      background: #1a1610;
+      border-right: 1px solid rgba(245,158,11,0.12);
       display: flex;
       flex-direction: column;
       transition: width 0.28s cubic-bezier(0.4,0,0.2,1),
@@ -108,27 +108,27 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       gap: 0.75rem;
       height: 64px;
       padding: 0 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid rgba(245,158,11,0.12);
       flex-shrink: 0;
     }
     .logo-box {
       width: 36px; height: 36px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      background: linear-gradient(135deg, #F59E0B, #D97706);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      box-shadow: 0 4px 14px rgba(99,102,241,0.4);
+      box-shadow: 0 4px 14px rgba(245,158,11,0.4);
     }
     .brand-name {
       font-weight: 700;
       font-size: 1rem;
-      color: #f8fafc;
+      color: #EDE4D8;
       white-space: nowrap;
     }
     .toggle-btn {
       background: transparent;
       border: none;
-      color: #64748b;
+      color: #817569;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       width: 32px; height: 32px;
@@ -136,7 +136,7 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       flex-shrink: 0;
       transition: background 0.18s, color 0.18s;
     }
-    .toggle-btn:hover { background: rgba(255,255,255,0.07); color: #e2e8f0; }
+    .toggle-btn:hover { background: rgba(245,158,11,0.1); color: #EDE4D8; }
 
     /* Nav */
     .sidebar-nav {
@@ -150,7 +150,7 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 0.08em;
-      color: #475569;
+      color: #6b5d50;
       padding: 0.75rem 0.75rem 0.25rem;
       text-transform: uppercase;
       white-space: nowrap;
@@ -160,7 +160,7 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       align-items: center;
       gap: 0.75rem;
       padding: 0.6rem 0.75rem;
-      color: #94a3b8;
+      color: #B7C8E1;
       text-decoration: none;
       border-radius: 8px;
       font-size: 0.875rem;
@@ -170,13 +170,13 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       overflow: hidden;
     }
     .nav-item:hover {
-      background: rgba(99,102,241,0.1);
-      color: #a5b4fc;
+      background: rgba(245,158,11,0.1);
+      color: #F59E0B;
     }
     .nav-item.active {
-      background: rgba(99,102,241,0.18);
-      color: #a5b4fc;
-      border: 1px solid rgba(99,102,241,0.25);
+      background: rgba(245,158,11,0.15);
+      color: #F59E0B;
+      border: 1px solid rgba(245,158,11,0.3);
     }
     .nav-icon { flex-shrink: 0; }
 
