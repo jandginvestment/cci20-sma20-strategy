@@ -114,7 +114,7 @@ import { AuthService } from '../../../core/auth/auth.service';
       width: 240px;
       min-width: 240px;
       height: 100vh;
-      background: #1c1710;
+      background: #120f0a;
       border-right: 1px solid rgba(245,158,11,0.12);
       display: flex;
       flex-direction: column;

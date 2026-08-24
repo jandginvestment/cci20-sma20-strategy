@@ -46,7 +46,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     .navbar {
       height: 64px;
       border-bottom: 1px solid rgba(245,158,11,0.12);
-      background: rgba(28, 23, 16, 0.92);
+      background: rgba(18, 15, 10, 0.95);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       display: flex;
