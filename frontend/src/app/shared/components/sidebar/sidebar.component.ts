@@ -90,7 +90,7 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       width: 240px;
       min-width: 240px;
       height: 100vh;
-      background: #1a1610;
+      background: #18181b;
       border-right: 1px solid rgba(245,158,11,0.12);
       display: flex;
       flex-direction: column;
@@ -189,7 +189,7 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
   `]
 })
 export class SidebarComponent implements OnInit {
-  private watchlistService = inject(WatchlistService);
+  private readonly watchlistService = inject(WatchlistService);
   
   collapsed = signal(false);
   watchlists = signal<WatchlistMeta[]>([]);

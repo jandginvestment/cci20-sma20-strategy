@@ -62,6 +62,7 @@ app = FastAPI(
     title="CCI/SMA Scanner API — Centralized Edition",
     version="2.5.0",
     default_response_class=ORJSONResponse,
+    root_path="/Prod",
 )
 
 app.add_middleware(
