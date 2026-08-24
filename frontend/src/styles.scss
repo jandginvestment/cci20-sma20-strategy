@@ -16,10 +16,17 @@
   --cyan:           #19BDFF;
 }
 
+// ── Force background on every root element ─────────────────────
+html, body, app-root {
+  background-color: #120f0a !important;
+  min-height: 100vh;
+}
+
 // ── Base layout shell (used across all pages) ──────────────────
 .layout-container {
   display: flex;
   height: 100vh;
+  background-color: #120f0a;
 }
 
 .layout-content {
