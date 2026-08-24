@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -80,6 +81,29 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
           <span class="nav-label">Settings</span>
         </a>
 
+        <!-- Help -->
+        <a href="https://github.com/jandginvestment/cci20-sma20-strategy" target="_blank"
+           class="nav-item" title="Help">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span class="nav-label">Help</span>
+        </a>
+
+        <!-- Logout -->
+        <a class="nav-item nav-item-danger" (click)="logout()" style="cursor:pointer" title="Logout">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span class="nav-label">Logout</span>
+        </a>
+
       </nav>
     </aside>
   `,
@@ -90,7 +114,7 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
       width: 240px;
       min-width: 240px;
       height: 100vh;
-      background: #18181b;
+      background: #1c1710;
       border-right: 1px solid rgba(245,158,11,0.12);
       display: flex;
       flex-direction: column;
@@ -190,7 +214,8 @@ import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.ser
 })
 export class SidebarComponent implements OnInit {
   private readonly watchlistService = inject(WatchlistService);
-  
+  private readonly authService = inject(AuthService);
+
   collapsed = signal(false);
   watchlists = signal<WatchlistMeta[]>([]);
 
@@ -202,5 +227,9 @@ export class SidebarComponent implements OnInit {
 
   toggle() {
     this.collapsed.set(!this.collapsed());
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }
