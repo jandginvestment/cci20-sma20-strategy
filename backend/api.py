@@ -352,6 +352,7 @@ async def get_results(
                 "cci_history":     r.cci_history or [],
             }
             for r in rows
+            if r.close is not None and r.cci_20 is not None and r.sma_20 is not None
         ],
     }
 
