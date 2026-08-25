@@ -190,30 +190,29 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                       <th class="th-sortable" [class.th-active]="sortCol()==='signal'"         (click)="sortBy('signal')">
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="#F59E0B" style="margin-right:3px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>SIGNAL <span class="sort-icon">{{ arrow('signal') }}</span>
                       </th>
-                      <th class="th-sortable" [class.th-active]="sortCol()==='yearly_low_pct'" (click)="sortBy('yearly_low_pct')">1-YR LOW <span class="sort-icon">{{ arrow('yearly_low_pct') }}</span></th>
-                      <th class="th-sortable" [class.th-active]="sortCol()==='monthly_low_pct'"(click)="sortBy('monthly_low_pct')">1-MO LOW <span class="sort-icon">{{ arrow('monthly_low_pct') }}</span></th>
-                      <th class="th-sortable" [class.th-active]="sortCol()==='weekly_low_pct'" (click)="sortBy('weekly_low_pct')">1-WK LOW <span class="sort-icon">{{ arrow('weekly_low_pct') }}</span></th>
-                      <th class="th-sortable" [class.th-active]="sortCol()==='yearly_low_pct'" (click)="sortBy('yearly_low_pct')">DIST Y% <span class="sort-icon">{{ arrow('yearly_low_pct') }}</span></th>
-                      <th class="th-sortable" [class.th-active]="sortCol()==='monthly_low_pct'"(click)="sortBy('monthly_low_pct')">DIST M% <span class="sort-icon">{{ arrow('monthly_low_pct') }}</span></th>
-                      <th class="th-sortable" [class.th-active]="sortCol()==='weekly_low_pct'" (click)="sortBy('weekly_low_pct')">DIST W% <span class="sort-icon">{{ arrow('weekly_low_pct') }}</span></th>
-                      <th>TAGS</th>
+                      <th class="th-sortable low-th" [class.th-active]="sortCol()==='yearly_low_pct'"  (click)="sortBy('yearly_low_pct')">1-YR LOW <span class="sort-icon">{{ arrow('yearly_low_pct') }}</span></th>
+                      <th class="th-sortable low-th" [class.th-active]="sortCol()==='monthly_low_pct'" (click)="sortBy('monthly_low_pct')">1-MO LOW <span class="sort-icon">{{ arrow('monthly_low_pct') }}</span></th>
+                      <th class="th-sortable low-th" [class.th-active]="sortCol()==='weekly_low_pct'"  (click)="sortBy('weekly_low_pct')">1-WK LOW <span class="sort-icon">{{ arrow('weekly_low_pct') }}</span></th>
+                      <th class="tags-col">TAGS</th>
                     </tr>
                   </thead>
                   <tbody>
                     @for (row of displayedResults(); track row.ticker; let i = $index) {
                       <tr [ngClass]="'row-sig-' + sigType(row)">
                         <td class="col-num text-secondary">{{ i + 1 }}</td>
-                        <td class="col-ticker">
-                          {{ row.ticker.replace('.NS','') }}
-                          <a [href]="'https://www.tradingview.com/chart/?symbol=NSE:' + row.ticker.replace('.NS','')"
-                             target="_blank" rel="noopener" class="tv-link" title="View on TradingView">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                              <polyline points="15 3 21 3 21 9"></polyline>
-                              <line x1="10" y1="14" x2="21" y2="3"></line>
-                            </svg>
-                          </a>
+                        <td>
+                          <div class="col-ticker">
+                            {{ row.ticker.replace('.NS','') }}
+                            <a [href]="'https://www.tradingview.com/chart/?symbol=NSE:' + row.ticker.replace('.NS','')"
+                               target="_blank" rel="noopener" class="tv-link" title="View on TradingView">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                              </svg>
+                            </a>
+                          </div>
                         </td>
                         <td class="col-price tabular">{{ row.close | number:'1.2-2' }}</td>
                         <td class="tabular" [class.cci-pos]="row.cci_20 > 0" [class.cci-neg]="row.cci_20 < 0">
@@ -228,25 +227,25 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                           </span>
                         </td>
                         <td><app-signal-badge [type]="sigType(row)"></app-signal-badge></td>
-                        <td class="tabular">{{ (row.yearly_low  ?? lowPrice(row.close, row.yearly_low_pct))  | number:'1.2-2' }}</td>
-                        <td class="tabular">{{ (row.monthly_low ?? lowPrice(row.close, row.monthly_low_pct)) | number:'1.2-2' }}</td>
-                        <td class="tabular">{{ (row.weekly_low  ?? lowPrice(row.close, row.weekly_low_pct))  | number:'1.2-2' }}</td>
-                        <td class="dist-col">
-                          <div class="dist-cell">
+                        <td class="low-col">
+                          <span class="low-price tabular">{{ (row.yearly_low  ?? lowPrice(row.close, row.yearly_low_pct))  | number:'1.2-2' }}</span>
+                          <div class="low-dist">
                             <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.yearly_low_pct)"  [style.width]="distW(row.yearly_low_pct)"></div></div>
-                            <span [ngClass]="distCls(row.yearly_low_pct)">{{ row.yearly_low_pct  | number:'1.1-1' }}%</span>
+                            <span class="dist-pct" [ngClass]="distCls(row.yearly_low_pct)">{{ row.yearly_low_pct  | number:'1.1-1' }}%</span>
                           </div>
                         </td>
-                        <td class="dist-col">
-                          <div class="dist-cell">
+                        <td class="low-col">
+                          <span class="low-price tabular">{{ (row.monthly_low ?? lowPrice(row.close, row.monthly_low_pct)) | number:'1.2-2' }}</span>
+                          <div class="low-dist">
                             <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.monthly_low_pct)" [style.width]="distW(row.monthly_low_pct)"></div></div>
-                            <span [ngClass]="distCls(row.monthly_low_pct)">{{ row.monthly_low_pct | number:'1.1-1' }}%</span>
+                            <span class="dist-pct" [ngClass]="distCls(row.monthly_low_pct)">{{ row.monthly_low_pct | number:'1.1-1' }}%</span>
                           </div>
                         </td>
-                        <td class="dist-col">
-                          <div class="dist-cell">
+                        <td class="low-col">
+                          <span class="low-price tabular">{{ (row.weekly_low  ?? lowPrice(row.close, row.weekly_low_pct))  | number:'1.2-2' }}</span>
+                          <div class="low-dist">
                             <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.weekly_low_pct)"  [style.width]="distW(row.weekly_low_pct)"></div></div>
-                            <span [ngClass]="distCls(row.weekly_low_pct)">{{ row.weekly_low_pct  | number:'1.1-1' }}%</span>
+                            <span class="dist-pct" [ngClass]="distCls(row.weekly_low_pct)">{{ row.weekly_low_pct  | number:'1.1-1' }}%</span>
                           </div>
                         </td>
                         <td class="tags-col">
@@ -340,22 +339,29 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
     .rows-hint { font-size: 0.72rem; color: #5a4a38; margin-left: auto; }
 
     /* Table extras */
-    .scanner-table { --bs-table-cell-padding-y: 0.35rem; }
+    .scanner-table { --bs-table-cell-padding-y: 0.3rem; }
     .col-num   { color: #5a4a38; font-size: 0.75rem; width: 30px; text-align: right; padding-right: 0.5rem !important; }
     .tabular   { font-variant-numeric: tabular-nums; }
-    .tags-col  { min-width: 108px; }
 
-    /* DIST cell */
-    .dist-col { min-width: 64px; }
-    .dist-cell {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      font-size: 0.8rem;
+    /* Combined LOW + DIST cell */
+    .low-th  { min-width: 96px; }
+    .low-col { min-width: 96px; }
+    .low-price {
+      display: block;
+      font-size: 0.82rem;
       font-variant-numeric: tabular-nums;
+      color: #D4C8B8;
+      line-height: 1.25;
+    }
+    .low-dist {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 3px;
     }
     .dist-bar {
-      height: 3px;
+      flex: 1;
+      height: 2px;
       background: rgba(255,255,255,0.08);
       border-radius: 2px;
       overflow: hidden;
@@ -365,6 +371,12 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
       border-radius: 2px;
       transition: width 0.4s ease;
     }
+    .dist-pct {
+      font-size: 0.7rem;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
     .dist-danger  { color: #ef4444; }
     .dist-warning { color: #F59E0B; }
     .dist-safe    { color: #10b981; }
@@ -373,13 +385,16 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
     .dist-fill.dist-safe    { background: #10b981; }
 
     /* TAGS */
+    .tags-col  { min-width: 108px; }
+
+    /* TAGS */
     .tags-cell { display: flex; flex-wrap: wrap; gap: 3px; }
     .tag { font-size: 0.65rem; font-weight: 700; padding: 0.15em 0.5em; border-radius: 50px; }
     .tag-yr { background: rgba(239,68,68,0.18);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
     .tag-mo { background: rgba(25,189,255,0.15); color: #7dd3fc; border: 1px solid rgba(25,189,255,0.25); }
     .tag-wk { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.25); }
 
-    .col-ticker { display: flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
+    .col-ticker { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
     .tv-link { color: #5a4a38; transition: color 0.18s; display: inline-flex; flex-shrink: 0; }
     .tv-link:hover { color: #F59E0B; }
   `]
