@@ -14,9 +14,9 @@ import { AuthService } from '../../../core/auth/auth.service';
       <div class="sidebar-header">
         <div class="logo-box" [class.d-none]="collapsed()">
           <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
-            <path d="M6 30L16 14L24 22L34 8" stroke="white" stroke-width="3.5"
+            <path d="M4 20 L12 20 L16 8 L20 32 L24 14 L28 22 L36 22"
+                  stroke="white" stroke-width="3.2" fill="none"
                   stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="34" cy="8" r="4" fill="white"/>
           </svg>
         </div>
         <span class="brand-name" [class.d-none]="collapsed()">CCI/SMA</span>

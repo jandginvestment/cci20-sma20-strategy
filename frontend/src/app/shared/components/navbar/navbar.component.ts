@@ -11,10 +11,10 @@ import { AuthService } from '../../../core/auth/auth.service';
     <nav class="navbar">
       <div class="nav-brand" routerLink="/">
         <div class="logo">
-          <svg width="24" height="24" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="8" fill="var(--bs-primary)" fill-opacity="0.2"/>
-            <path d="M10 28L18 16L24 22L30 12" stroke="var(--bs-primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="30" cy="12" r="3" fill="var(--bs-primary)"/>
+          <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
+            <path d="M4 20 L12 20 L16 8 L20 32 L24 14 L28 22 L36 22"
+                  stroke="white" stroke-width="3" fill="none"
+                  stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <span class="brand-text">CCI/SMA Scanner</span>
