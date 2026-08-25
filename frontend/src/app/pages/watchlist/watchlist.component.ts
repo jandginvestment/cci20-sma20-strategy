@@ -249,7 +249,7 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                             <span [ngClass]="distCls(row.weekly_low_pct)">{{ row.weekly_low_pct  | number:'1.1-1' }}%</span>
                           </div>
                         </td>
-                        <td>
+                        <td class="tags-col">
                           <div class="tags-cell">
                             @if (row.yearly_low_pct  <= YR_THR) { <span class="tag tag-yr">1-Yr</span> }
                             @if (row.monthly_low_pct <= MO_THR) { <span class="tag tag-mo">1-Mo</span> }
@@ -340,8 +340,10 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
     .rows-hint { font-size: 0.72rem; color: #5a4a38; margin-left: auto; }
 
     /* Table extras */
+    .scanner-table { --bs-table-cell-padding-y: 0.35rem; }
     .col-num   { color: #5a4a38; font-size: 0.75rem; width: 30px; text-align: right; padding-right: 0.5rem !important; }
     .tabular   { font-variant-numeric: tabular-nums; }
+    .tags-col  { min-width: 108px; }
 
     /* DIST cell */
     .dist-col { min-width: 64px; }

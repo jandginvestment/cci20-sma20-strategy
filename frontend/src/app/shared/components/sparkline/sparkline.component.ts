@@ -1,7 +1,7 @@
 import { Component, input, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
-const W = 80, H = 30, MAX = 250, MIN = -250;
+const W = 68, H = 24, MAX = 250, MIN = -250;
 let _uid = 0;
 
 @Component({
