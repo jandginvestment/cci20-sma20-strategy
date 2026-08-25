@@ -17,6 +17,9 @@ export interface SignalResult {
   yearly_low_pct: number;
   monthly_low_pct: number;
   weekly_low_pct: number;
+  yearly_low: number | null;
+  monthly_low: number | null;
+  weekly_low: number | null;
 }
 
 export interface WatchlistResults {

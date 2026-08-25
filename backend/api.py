@@ -346,6 +346,9 @@ async def get_results(
                 "yearly_low_pct":  float(r.pct_from_y_low) if r.pct_from_y_low is not None else None,
                 "monthly_low_pct": float(r.pct_from_m_low) if r.pct_from_m_low is not None else None,
                 "weekly_low_pct":  float(r.pct_from_w_low) if r.pct_from_w_low is not None else None,
+                "yearly_low":      float(r.yearly_low)      if r.yearly_low      is not None else None,
+                "monthly_low":     float(r.monthly_low)     if r.monthly_low     is not None else None,
+                "weekly_low":      float(r.weekly_low)      if r.weekly_low      is not None else None,
                 "cci_history":     r.cci_history or [],
             }
             for r in rows

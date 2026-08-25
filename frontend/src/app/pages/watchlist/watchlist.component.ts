@@ -217,9 +217,9 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                           </span>
                         </td>
                         <td><app-signal-badge [type]="sigType(row)"></app-signal-badge></td>
-                        <td class="tabular">{{ lowPrice(row.close, row.yearly_low_pct)  | number:'1.2-2' }}</td>
-                        <td class="tabular">{{ lowPrice(row.close, row.monthly_low_pct) | number:'1.2-2' }}</td>
-                        <td class="tabular">{{ lowPrice(row.close, row.weekly_low_pct)  | number:'1.2-2' }}</td>
+                        <td class="tabular">{{ (row.yearly_low  ?? lowPrice(row.close, row.yearly_low_pct))  | number:'1.2-2' }}</td>
+                        <td class="tabular">{{ (row.monthly_low ?? lowPrice(row.close, row.monthly_low_pct)) | number:'1.2-2' }}</td>
+                        <td class="tabular">{{ (row.weekly_low  ?? lowPrice(row.close, row.weekly_low_pct))  | number:'1.2-2' }}</td>
                         <td class="dist-cell">
                           <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.yearly_low_pct)"  [style.width]="distW(row.yearly_low_pct)"></div></div>
                           <span [ngClass]="distCls(row.yearly_low_pct)">{{ row.yearly_low_pct  | number:'1.1-1' }}%</span>
