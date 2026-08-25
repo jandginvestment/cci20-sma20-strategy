@@ -220,17 +220,23 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                         <td class="tabular">{{ (row.yearly_low  ?? lowPrice(row.close, row.yearly_low_pct))  | number:'1.2-2' }}</td>
                         <td class="tabular">{{ (row.monthly_low ?? lowPrice(row.close, row.monthly_low_pct)) | number:'1.2-2' }}</td>
                         <td class="tabular">{{ (row.weekly_low  ?? lowPrice(row.close, row.weekly_low_pct))  | number:'1.2-2' }}</td>
-                        <td class="dist-cell">
-                          <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.yearly_low_pct)"  [style.width]="distW(row.yearly_low_pct)"></div></div>
-                          <span [ngClass]="distCls(row.yearly_low_pct)">{{ row.yearly_low_pct  | number:'1.1-1' }}%</span>
+                        <td class="dist-col">
+                          <div class="dist-cell">
+                            <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.yearly_low_pct)"  [style.width]="distW(row.yearly_low_pct)"></div></div>
+                            <span [ngClass]="distCls(row.yearly_low_pct)">{{ row.yearly_low_pct  | number:'1.1-1' }}%</span>
+                          </div>
                         </td>
-                        <td class="dist-cell">
-                          <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.monthly_low_pct)" [style.width]="distW(row.monthly_low_pct)"></div></div>
-                          <span [ngClass]="distCls(row.monthly_low_pct)">{{ row.monthly_low_pct | number:'1.1-1' }}%</span>
+                        <td class="dist-col">
+                          <div class="dist-cell">
+                            <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.monthly_low_pct)" [style.width]="distW(row.monthly_low_pct)"></div></div>
+                            <span [ngClass]="distCls(row.monthly_low_pct)">{{ row.monthly_low_pct | number:'1.1-1' }}%</span>
+                          </div>
                         </td>
-                        <td class="dist-cell">
-                          <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.weekly_low_pct)"  [style.width]="distW(row.weekly_low_pct)"></div></div>
-                          <span [ngClass]="distCls(row.weekly_low_pct)">{{ row.weekly_low_pct  | number:'1.1-1' }}%</span>
+                        <td class="dist-col">
+                          <div class="dist-cell">
+                            <div class="dist-bar"><div class="dist-fill" [ngClass]="distCls(row.weekly_low_pct)"  [style.width]="distW(row.weekly_low_pct)"></div></div>
+                            <span [ngClass]="distCls(row.weekly_low_pct)">{{ row.weekly_low_pct  | number:'1.1-1' }}%</span>
+                          </div>
                         </td>
                         <td>
                           <div class="tags-cell">
@@ -327,11 +333,11 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
     .tabular   { font-variant-numeric: tabular-nums; }
 
     /* DIST cell */
+    .dist-col { min-width: 64px; }
     .dist-cell {
       display: flex;
       flex-direction: column;
       gap: 3px;
-      min-width: 64px;
       font-size: 0.8rem;
       font-variant-numeric: tabular-nums;
     }
