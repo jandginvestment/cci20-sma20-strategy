@@ -203,7 +203,18 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                     @for (row of displayedResults(); track row.ticker; let i = $index) {
                       <tr [ngClass]="'row-sig-' + sigType(row)">
                         <td class="col-num text-secondary">{{ i + 1 }}</td>
-                        <td class="col-ticker">{{ row.ticker.replace('.NS','') }}</td>
+                        <td class="col-ticker">
+                          {{ row.ticker.replace('.NS','') }}
+                          <a [href]="'https://www.tradingview.com/chart/?symbol=NSE:' + row.ticker.replace('.NS','')"
+                             target="_blank" rel="noopener" class="tv-link" title="View on TradingView">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                              <polyline points="15 3 21 3 21 9"></polyline>
+                              <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                          </a>
+                        </td>
                         <td class="col-price tabular">{{ row.close | number:'1.2-2' }}</td>
                         <td class="tabular" [class.cci-pos]="row.cci_20 > 0" [class.cci-neg]="row.cci_20 < 0">
                           {{ row.cci_20 | number:'1.1-1' }}
@@ -366,7 +377,8 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
     .tag-mo { background: rgba(25,189,255,0.15); color: #7dd3fc; border: 1px solid rgba(25,189,255,0.25); }
     .tag-wk { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.25); }
 
-    .tv-link { color: #5a4a38; transition: color 0.18s; display: inline-flex; }
+    .col-ticker { display: flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
+    .tv-link { color: #5a4a38; transition: color 0.18s; display: inline-flex; flex-shrink: 0; }
     .tv-link:hover { color: #F59E0B; }
   `]
 })
