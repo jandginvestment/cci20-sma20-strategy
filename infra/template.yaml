@@ -108,6 +108,9 @@ Resources:
       MemorySize: 1024
       Timeout: 900          # 15 minutes — yfinance downloads ~600 tickers
       Description: "CCI/SMA stock scanner — pandas/numpy/yfinance via ECR container"
+      Environment:
+        Variables:
+          YFINANCE_CACHE_DIR: /tmp
       Events:
         MorningCron:
           Type: Schedule

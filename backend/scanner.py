@@ -147,11 +147,18 @@ def sync_default_watchlists(watchlists_dir: str, session: Session, admin_user: U
 def scan_single_ticker(ticker_symbol: str) -> dict | None:
     """Download OHLCV (~380 calendar days / ~260 trading days) and compute CCI(20) & SMA(20)."""
     try:
-        end_date   = datetime.date.today()
+        end_date   = datetime.date.today() + datetime.timedelta(days=1)
         start_date = end_date - datetime.timedelta(days=380)
+        
+        import requests
+        session = requests.Session()
+        session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        })
+        
         df = yf.download(
             ticker_symbol, start=start_date, end=end_date,
-            interval="1d", progress=False,
+            interval="1d", progress=False, session=session
         )
 
         if isinstance(df.columns, pd.MultiIndex):
@@ -280,10 +287,15 @@ def run_scanner(watchlists_dir: str, user_id=None):
             session.add(rec)
 
         saved_count += 1
-        if saved_count % 20 == 0:
+        
+        # Commit every iteration to return connection to pool.
+        # This allows pool_pre_ping to detect dropped Neon DB connections.
+        try:
             session.commit()
+        except Exception as exc:
+            print(f"DB Error for {ticker}: {exc}")
+            session.rollback()
 
-    session.commit()
     session.close()
     print(f"\n[OK] Centralized scan complete. Saved metrics for {saved_count} unique tickers.")
 
