@@ -7,6 +7,7 @@ on:
       - 'backend/**'
       - 'infra/**'
       - 'frontend/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 env:
