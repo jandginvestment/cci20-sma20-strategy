@@ -150,15 +150,9 @@ def scan_single_ticker(ticker_symbol: str) -> dict | None:
         end_date   = datetime.date.today() + datetime.timedelta(days=1)
         start_date = end_date - datetime.timedelta(days=380)
         
-        import requests
-        session = requests.Session()
-        session.headers.update({
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        })
-        
         df = yf.download(
             ticker_symbol, start=start_date, end=end_date,
-            interval="1d", progress=False, session=session
+            interval="1d", progress=False
         )
 
         if isinstance(df.columns, pd.MultiIndex):
