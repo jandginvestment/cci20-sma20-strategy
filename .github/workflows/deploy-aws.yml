@@ -43,49 +43,10 @@ jobs:
             --region          ${{ env.AWS_REGION }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
+            --resolve-image-repos \
             --capabilities    CAPABILITY_IAM \
             --parameter-overrides \
               DatabaseUrl="${{ secrets.DATABASE_URL }}" \
               DatabaseUrlSync="${{ secrets.DATABASE_URL_SYNC }}" \
               AdminCognitoSub="${{ secrets.ADMIN_COGNITO_SUB }}" \
               CorsOrigins="${{ secrets.CORS_ORIGINS }}"
-
-  # ── Deploy Angular → GitHub Pages ───────────────────────────────────────────
-  deploy-frontend:
-    name: Build & Deploy Angular 19
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: frontend
-
-      - name: Build Angular (production)
-        run: npx ng build --configuration production --base-href "/cci20-sma20-strategy/"
-        working-directory: frontend
-        env:
-          # These are baked into the environment.prod.ts at build time
-          # Update frontend/src/environments/environment.prod.ts with real values
-          # after first SAM deploy, then push to aws branch.
-          NODE_ENV: production
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./frontend/dist/frontend/browser
-
-      - uses: actions/deploy-pages@v4
-        id: deployment
