@@ -44,6 +44,7 @@ jobs:
             --region          ${{ env.AWS_REGION }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
+            --resolve-s3 \
             --resolve-image-repos \
             --capabilities    CAPABILITY_IAM \
             --parameter-overrides \
