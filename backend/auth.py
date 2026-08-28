@@ -125,3 +125,17 @@ async def get_current_user(
         logger.info("Auto-created user cognito_sub=%s", cognito_sub)
 
     return user
+
+ADMIN_COGNITO_SUB = os.environ.get("ADMIN_COGNITO_SUB", "scanner-admin")
+
+async def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
+    """
+    FastAPI dependency for routes that require Admin privileges.
+    Verifies that the current user's cognito_sub matches the ADMIN_COGNITO_SUB.
+    """
+    if current_user.cognito_sub != ADMIN_COGNITO_SUB:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required"
+        )
+    return current_user

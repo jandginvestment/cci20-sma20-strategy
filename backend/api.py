@@ -29,7 +29,7 @@ _backend_dir = os.path.dirname(__file__)
 if _backend_dir not in sys.path:
     sys.path.insert(0, _backend_dir)
 
-from auth import get_current_user
+from auth import get_current_user, get_admin_user, ADMIN_COGNITO_SUB
 from db.connection import get_db
 from db.models import (
     DailyStockMetric, User, UserSubscription, Watchlist, WatchlistItem, generate_share_id
@@ -92,7 +92,57 @@ async def me(current_user: User = Depends(get_current_user)):
         "id":         str(current_user.id),
         "email":      current_user.email,
         "created_at": current_user.created_at,
+        "is_admin":   current_user.cognito_sub == ADMIN_COGNITO_SUB
     }
+
+# ── Admin ──────────────────────────────────────────────────────────────────────
+
+@app.get("/admin/users")
+async def get_all_users(
+    admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Admin only: List all users."""
+    res = await db.execute(select(User).order_by(User.created_at.desc()))
+    users = res.scalars().all()
+    
+    result = []
+    for u in users:
+        # Get count of owned watchlists
+        wl_res = await db.execute(select(func.count(Watchlist.id)).where(Watchlist.user_id == u.id))
+        wl_count = wl_res.scalar()
+        
+        result.append({
+            "id": str(u.id),
+            "email": u.email,
+            "created_at": u.created_at,
+            "cognito_sub": u.cognito_sub,
+            "watchlists_count": wl_count
+        })
+    return result
+
+@app.delete("/admin/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Admin only: Delete a user and cascade delete their data."""
+    if user_id == str(admin.id):
+        raise HTTPException(400, "Cannot delete yourself")
+        
+    res = await db.execute(select(User).where(User.id == user_id))
+    user_to_delete = res.scalar_one_or_none()
+    
+    if not user_to_delete:
+        raise HTTPException(404, "User not found")
+        
+    if user_to_delete.cognito_sub == ADMIN_COGNITO_SUB:
+        raise HTTPException(403, "Cannot delete the admin user")
+
+    await db.delete(user_to_delete)
+    await db.commit()
+    return {"status": "deleted", "user_id": user_id}
 
 # ── Watchlists & Subscriptions ─────────────────────────────────────────────────
 

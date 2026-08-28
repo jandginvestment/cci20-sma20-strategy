@@ -12,6 +12,9 @@ export class AuthService {
   private _userEmail = signal<string | null>(this.parseEmailFromToken());
   public userEmail = computed(() => this._userEmail());
 
+  private _isAdmin = signal<boolean>(false);
+  public isAdmin = computed(() => this._isAdmin());
+
   private generateRandomString(length: number): string {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
     let result = '';
@@ -21,6 +24,12 @@ export class AuthService {
       result += charset[values[i] % charset.length];
     }
     return result;
+  }
+
+  constructor() {
+    if (this._isAuthenticated()) {
+      this.fetchMe();
+    }
   }
 
   private async generateCodeChallenge(codeVerifier: string): Promise<string> {
@@ -98,10 +107,28 @@ export class AuthService {
       localStorage.removeItem('auth_state');
       localStorage.removeItem('code_verifier');
       
+      await this.fetchMe();
+      
       return true;
     } catch (error) {
       console.error(error);
       return false;
+    }
+  }
+
+  async fetchMe(): Promise<void> {
+    try {
+      const response = await fetch(`${environment.apiUrl}/me`, {
+        headers: {
+          'Authorization': `Bearer ${this.getAccessToken()}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        this._isAdmin.set(!!data.is_admin);
+      }
+    } catch (e) {
+      console.error('Failed to fetch /me', e);
     }
   }
 
@@ -111,6 +138,7 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
     this._isAuthenticated.set(false);
     this._userEmail.set(null);
+    this._isAdmin.set(false);
 
     const { domain, clientId, logoutUri } = environment.cognito;
     const url = `${domain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
