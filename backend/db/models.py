@@ -156,6 +156,9 @@ class DailyStockMetric(Base):
     # 20-day CCI history for sparklines
     cci_history    = Column(JSONB)
 
+    # Weekly CPR (Central Pivot Range) — narrow = potential breakout
+    narrow_cpr     = Column(Boolean, default=False)
+
 
 # ── Legacy Compatibility Models ─────────────────────────────────────────────────
 

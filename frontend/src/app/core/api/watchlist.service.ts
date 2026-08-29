@@ -20,6 +20,7 @@ export interface SignalResult {
   yearly_low: number | null;
   monthly_low: number | null;
   weekly_low: number | null;
+  narrow_cpr: boolean;
 }
 
 export interface WatchlistResults {

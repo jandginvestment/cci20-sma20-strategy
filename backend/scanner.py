@@ -191,6 +191,22 @@ def scan_single_ticker(ticker_symbol: str) -> dict | None:
             for x in df["CCI_20"].iloc[-20:].tolist()
         ]
 
+        # Weekly CPR (Central Pivot Range) for swing traders
+        # Use previous completed week's High/Low/Close
+        try:
+            weekly = df.resample('W').agg({'High': 'max', 'Low': 'min', 'Close': 'last'}).dropna()
+            if len(weekly) >= 2:
+                prev = weekly.iloc[-2]  # previous completed week
+                pivot = (prev['High'] + prev['Low'] + prev['Close']) / 3
+                bc    = (prev['High'] + prev['Low']) / 2
+                tc    = (2 * pivot) - bc
+                cpr_width = abs(float(tc) - float(bc)) / float(prev['Close']) * 100
+                narrow_cpr = bool(cpr_width < 0.5)
+            else:
+                narrow_cpr = False
+        except Exception:
+            narrow_cpr = False
+
         return {
             "ticker":         ticker_symbol,
             "close":          round(latest_price, 4),
@@ -206,6 +222,7 @@ def scan_single_ticker(ticker_symbol: str) -> dict | None:
             "near_m_low":     bool(pct_monthly <= 5.0),
             "near_w_low":     bool(pct_weekly  <= 5.0),
             "cci_history":    cci_hist,
+            "narrow_cpr":     narrow_cpr,
         }
 
     except Exception as exc:
@@ -259,6 +276,7 @@ def run_scanner(watchlists_dir: str, user_id=None):
             existing.near_m_low     = metrics["near_m_low"]
             existing.near_w_low     = metrics["near_w_low"]
             existing.cci_history    = metrics["cci_history"]
+            existing.narrow_cpr     = metrics["narrow_cpr"]
             existing.scanned_at     = datetime.datetime.utcnow()
         else:
             rec = DailyStockMetric(
@@ -277,6 +295,7 @@ def run_scanner(watchlists_dir: str, user_id=None):
                 near_m_low     = metrics["near_m_low"],
                 near_w_low     = metrics["near_w_low"],
                 cci_history    = metrics["cci_history"],
+                narrow_cpr     = metrics["narrow_cpr"],
             )
             session.add(rec)
 

@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
 type LowFilter = 'all' | 'yearly' | 'monthly' | 'weekly';
 type SigFilter = 'all' | 'reversal' | 'recovery' | 'momentum' | 'overbought';
 type SortCol   = 'ticker' | 'signal' | 'close' | 'cci_20' | 'sma_20'
-               | 'yearly_low_pct' | 'monthly_low_pct' | 'weekly_low_pct';
+               | 'narrow_cpr' | 'yearly_low_pct' | 'monthly_low_pct' | 'weekly_low_pct';
 type SortDir   = 'asc' | 'desc';
 
 const SIG_ORDER: Record<string, number> = { reversal: 0, recovery: 1, momentum: 2, overbought: 3, neutral: 4 };
@@ -190,6 +190,7 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                       <th class="th-sortable" [class.th-active]="sortCol()==='signal'"         (click)="sortBy('signal')">
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="#F59E0B" style="margin-right:3px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>SIGNAL <span class="sort-icon">{{ arrow('signal') }}</span>
                       </th>
+                      <th class="th-sortable cpr-th" [class.th-active]="sortCol()==='narrow_cpr'" (click)="sortBy('narrow_cpr')">CPR <span class="sort-icon">{{ arrow('narrow_cpr') }}</span></th>
                       <th class="th-sortable low-th" [class.th-active]="sortCol()==='yearly_low_pct'"  (click)="sortBy('yearly_low_pct')">1-YR LOW <span class="sort-icon">{{ arrow('yearly_low_pct') }}</span></th>
                       <th class="th-sortable low-th" [class.th-active]="sortCol()==='monthly_low_pct'" (click)="sortBy('monthly_low_pct')">1-MO LOW <span class="sort-icon">{{ arrow('monthly_low_pct') }}</span></th>
                       <th class="th-sortable low-th" [class.th-active]="sortCol()==='weekly_low_pct'"  (click)="sortBy('weekly_low_pct')">1-WK LOW <span class="sort-icon">{{ arrow('weekly_low_pct') }}</span></th>
@@ -227,6 +228,13 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                           </span>
                         </td>
                         <td><app-signal-badge [type]="sigType(row)"></app-signal-badge></td>
+                        <td class="cpr-col">
+                          @if (row.narrow_cpr) {
+                            <span class="cpr-badge cpr-yes">Yes</span>
+                          } @else {
+                            <span class="cpr-badge cpr-no">No</span>
+                          }
+                        </td>
                         <td class="low-col">
                           <span class="low-price tabular">{{ (row.yearly_low  ?? lowPrice(row.close, row.yearly_low_pct))  | number:'1.2-2' }}</span>
                           <div class="low-dist">
@@ -397,6 +405,28 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
     .col-ticker { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
     .tv-link { color: #5a4a38; transition: color 0.18s; display: inline-flex; flex-shrink: 0; }
     .tv-link:hover { color: #F59E0B; }
+
+    /* CPR column */
+    .cpr-th  { min-width: 56px; text-align: center; }
+    .cpr-col { text-align: center; }
+    .cpr-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15em 0.55em;
+      border-radius: 50px;
+      letter-spacing: 0.03em;
+    }
+    .cpr-yes {
+      background: rgba(245, 158, 11, 0.18);
+      color: #F59E0B;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .cpr-no {
+      background: transparent;
+      color: #4a3e30;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
   `]
 })
 export class WatchlistComponent {
@@ -512,6 +542,7 @@ export class WatchlistComponent {
       switch (col) {
         case 'ticker':          va = a.ticker;                          vb = b.ticker;                          break;
         case 'signal':          va = SIG_ORDER[this.sigType(a)] ?? 9;  vb = SIG_ORDER[this.sigType(b)] ?? 9;  break;
+        case 'narrow_cpr':      va = a.narrow_cpr ? 0 : 1;             vb = b.narrow_cpr ? 0 : 1;             break;
         case 'close':           va = a.close;                           vb = b.close;                           break;
         case 'cci_20':          va = a.cci_20;                          vb = b.cci_20;                          break;
         case 'sma_20':          va = a.sma_20;                          vb = b.sma_20;                          break;

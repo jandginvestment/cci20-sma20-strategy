@@ -400,6 +400,7 @@ async def get_results(
                 "monthly_low":     float(r.monthly_low)     if r.monthly_low     is not None else None,
                 "weekly_low":      float(r.weekly_low)      if r.weekly_low      is not None else None,
                 "cci_history":     r.cci_history or [],
+                "narrow_cpr":      bool(r.narrow_cpr) if r.narrow_cpr is not None else False,
             }
             for r in rows
             if r.close is not None and r.cci_20 is not None and r.sma_20 is not None

@@ -2,6 +2,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { DisclaimerDialogComponent } from '../disclaimer-dialog/disclaimer-dialog.component';
 
 @Component({
   selector: 'app-sidebar',
@@ -90,6 +92,17 @@ import { AuthService } from '../../../core/auth/auth.service';
                      a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
           <span class="nav-label">Settings</span>
+        </a>
+
+        <!-- Disclaimer -->
+        <a (click)="openDisclaimer()" style="cursor:pointer" class="nav-item" title="Disclaimer">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span class="nav-label">Disclaimer</span>
         </a>
 
         <!-- Help -->
@@ -226,6 +239,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 export class SidebarComponent implements OnInit {
   private readonly watchlistService = inject(WatchlistService);
   public readonly authService = inject(AuthService);
+  private readonly dialog = inject(MatDialog);
 
   collapsed = signal(false);
   watchlists = signal<WatchlistMeta[]>([]);
@@ -238,6 +252,13 @@ export class SidebarComponent implements OnInit {
 
   toggle() {
     this.collapsed.set(!this.collapsed());
+  }
+
+  openDisclaimer() {
+    this.dialog.open(DisclaimerDialogComponent, {
+      width: '500px',
+      panelClass: 'disclaimer-panel'
+    });
   }
 
   logout() {
