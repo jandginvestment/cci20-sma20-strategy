@@ -11,7 +11,6 @@ import { RouterModule } from '@angular/router';
 
 type LowFilter = 'all' | 'yearly' | 'monthly' | 'weekly';
 type SigFilter = 'all' | 'reversal' | 'recovery' | 'momentum' | 'overbought';
-type CprFilter = 'all' | 'narrow' | 'bullish_narrow';
 type SortCol   = 'ticker' | 'signal' | 'close' | 'cci_20' | 'sma_20'
                | 'narrow_cpr' | 'yearly_low_pct' | 'monthly_low_pct' | 'weekly_low_pct';
 type SortDir   = 'asc' | 'desc';
@@ -76,17 +75,17 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                 <line x1="12" y1="20" x2="12" y2="4"></line>
                 <line x1="6" y1="20" x2="6" y2="14"></line>
               </svg>
-              CPR Filters:
+              Extra Filters:
             </span>
             <div class="form-check form-switch d-inline-flex align-items-center gap-2 m-0 p-0 ps-4">
               <input class="form-check-input custom-switch m-0" type="checkbox" role="switch" id="narrowCprSwitch"
-                     [checked]="cprFilter()==='narrow'" (change)="toggleCprFilter('narrow')">
-              <label class="form-check-label text-secondary fs-7" for="narrowCprSwitch">Narrow CPR</label>
+                     [checked]="narrowCprFilter()" (change)="narrowCprFilter.set(!narrowCprFilter())">
+              <label class="form-check-label text-secondary fs-7" for="narrowCprSwitch">Narrow CPR Only</label>
             </div>
             <div class="form-check form-switch d-inline-flex align-items-center gap-2 m-0 p-0 ps-4">
-              <input class="form-check-input custom-switch m-0" type="checkbox" role="switch" id="bullishNarrowSwitch"
-                     [checked]="cprFilter()==='bullish_narrow'" (change)="toggleCprFilter('bullish_narrow')">
-              <label class="form-check-label text-secondary fs-7" for="bullishNarrowSwitch">Bullish + Narrow</label>
+              <input class="form-check-input custom-switch m-0" type="checkbox" role="switch" id="aboveSmaSwitch"
+                     [checked]="aboveSmaFilter()" (change)="aboveSmaFilter.set(!aboveSmaFilter())">
+              <label class="form-check-label text-secondary fs-7" for="aboveSmaSwitch">Above SMA (Bullish) Only</label>
             </div>
           </div>
 
@@ -481,7 +480,8 @@ export class WatchlistComponent {
 
   lowFilter = signal<LowFilter>('all');
   sigFilter = signal<SigFilter>('all');
-  cprFilter = signal<CprFilter>('all');
+  narrowCprFilter = signal<boolean>(false);
+  aboveSmaFilter   = signal<boolean>(false);
   sortCol   = signal<SortCol>('yearly_low_pct');
   sortDir   = signal<SortDir>('asc');
 
@@ -518,10 +518,6 @@ export class WatchlistComponent {
 
   toggleSig(s: 'reversal' | 'recovery' | 'momentum' | 'overbought') {
     this.sigFilter.set(this.sigFilter() === s ? 'all' : s);
-  }
-
-  toggleCprFilter(f: CprFilter) {
-    this.cprFilter.set(this.cprFilter() === f ? 'all' : f);
   }
 
   sortBy(col: SortCol) {
@@ -579,11 +575,11 @@ export class WatchlistComponent {
     const sf = this.sigFilter();
     if (sf !== 'all') res = res.filter(r => this.sigType(r) === sf);
 
-    const cf = this.cprFilter();
-    if (cf === 'narrow') {
+    if (this.narrowCprFilter()) {
       res = res.filter(r => r.narrow_cpr);
-    } else if (cf === 'bullish_narrow') {
-      res = res.filter(r => r.narrow_cpr && r.close >= r.sma_20);
+    }
+    if (this.aboveSmaFilter()) {
+      res = res.filter(r => r.close >= r.sma_20);
     }
 
     const col = this.sortCol();
