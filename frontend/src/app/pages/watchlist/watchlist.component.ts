@@ -230,6 +230,14 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                                 <line x1="10" y1="14" x2="21" y2="3"></line>
                               </svg>
                             </a>
+                            <a [href]="'https://www.google.com/search?q=NSE:' + row.ticker.replace('.NS','') + '+share+price'"
+                               target="_blank" rel="noopener" class="google-link" title="Search on Google">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                   stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                              </svg>
+                            </a>
                           </div>
                         </td>
                         <td class="col-price tabular">{{ row.close | number:'1.2-2' }}</td>
@@ -422,6 +430,8 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
     .col-ticker { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
     .tv-link { color: #5a4a38; transition: color 0.18s; display: inline-flex; flex-shrink: 0; }
     .tv-link:hover { color: #F59E0B; }
+    .google-link { color: #5a4a38; transition: color 0.18s; display: inline-flex; flex-shrink: 0; }
+    .google-link:hover { color: #F59E0B; }
 
     /* CPR column */
     .cpr-th  { min-width: 56px; text-align: center; }
