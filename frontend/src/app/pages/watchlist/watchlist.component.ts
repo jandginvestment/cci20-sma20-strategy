@@ -67,7 +67,7 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
             }
           </div>
 
-          <!-- CPR filter switches -->
+          <!-- Additional Filters (CPR) -->
           <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
             <span class="sig-label">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -75,19 +75,12 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
                 <line x1="12" y1="20" x2="12" y2="4"></line>
                 <line x1="6" y1="20" x2="6" y2="14"></line>
               </svg>
-              Extra Filters:
+              Additional:
             </span>
             <div class="form-check form-switch d-inline-flex align-items-center gap-2 m-0 p-0 ps-4">
               <input class="form-check-input custom-switch m-0" type="checkbox" role="switch" id="narrowCprSwitch"
-                     [checked]="narrowCprFilter()" (change)="toggleNarrowCpr()">
+                     [checked]="narrowCprFilter()" (change)="narrowCprFilter.set(!narrowCprFilter())">
               <label class="form-check-label text-secondary fs-7" for="narrowCprSwitch">Narrow CPR Only</label>
-            </div>
-            <div class="form-check form-switch d-inline-flex align-items-center gap-2 m-0 p-0 ps-4"
-                 [style.opacity]="narrowCprFilter() ? 1 : 0.45" style="transition: opacity 0.18s ease">
-              <input class="form-check-input custom-switch m-0" type="checkbox" role="switch" id="aboveSmaSwitch"
-                     [disabled]="!narrowCprFilter()"
-                     [checked]="aboveSmaFilter()" (change)="aboveSmaFilter.set(!aboveSmaFilter())">
-              <label class="form-check-label text-secondary fs-7" for="aboveSmaSwitch">Above SMA (Bullish) Only</label>
             </div>
           </div>
 
@@ -483,7 +476,6 @@ export class WatchlistComponent {
   lowFilter = signal<LowFilter>('all');
   sigFilter = signal<SigFilter>('all');
   narrowCprFilter = signal<boolean>(false);
-  aboveSmaFilter   = signal<boolean>(false);
   sortCol   = signal<SortCol>('yearly_low_pct');
   sortDir   = signal<SortDir>('asc');
 
@@ -520,14 +512,6 @@ export class WatchlistComponent {
 
   toggleSig(s: 'reversal' | 'recovery' | 'momentum' | 'overbought') {
     this.sigFilter.set(this.sigFilter() === s ? 'all' : s);
-  }
-
-  toggleNarrowCpr() {
-    const nextVal = !this.narrowCprFilter();
-    this.narrowCprFilter.set(nextVal);
-    if (!nextVal) {
-      this.aboveSmaFilter.set(false);
-    }
   }
 
   sortBy(col: SortCol) {
@@ -587,9 +571,6 @@ export class WatchlistComponent {
 
     if (this.narrowCprFilter()) {
       res = res.filter(r => r.narrow_cpr);
-      if (this.aboveSmaFilter()) {
-        res = res.filter(r => r.close >= r.sma_20);
-      }
     }
 
     const col = this.sortCol();
