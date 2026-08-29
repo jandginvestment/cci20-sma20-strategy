@@ -79,11 +79,13 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
             </span>
             <div class="form-check form-switch d-inline-flex align-items-center gap-2 m-0 p-0 ps-4">
               <input class="form-check-input custom-switch m-0" type="checkbox" role="switch" id="narrowCprSwitch"
-                     [checked]="narrowCprFilter()" (change)="narrowCprFilter.set(!narrowCprFilter())">
+                     [checked]="narrowCprFilter()" (change)="toggleNarrowCpr()">
               <label class="form-check-label text-secondary fs-7" for="narrowCprSwitch">Narrow CPR Only</label>
             </div>
-            <div class="form-check form-switch d-inline-flex align-items-center gap-2 m-0 p-0 ps-4">
+            <div class="form-check form-switch d-inline-flex align-items-center gap-2 m-0 p-0 ps-4"
+                 [style.opacity]="narrowCprFilter() ? 1 : 0.45" style="transition: opacity 0.18s ease">
               <input class="form-check-input custom-switch m-0" type="checkbox" role="switch" id="aboveSmaSwitch"
+                     [disabled]="!narrowCprFilter()"
                      [checked]="aboveSmaFilter()" (change)="aboveSmaFilter.set(!aboveSmaFilter())">
               <label class="form-check-label text-secondary fs-7" for="aboveSmaSwitch">Above SMA (Bullish) Only</label>
             </div>
@@ -520,6 +522,14 @@ export class WatchlistComponent {
     this.sigFilter.set(this.sigFilter() === s ? 'all' : s);
   }
 
+  toggleNarrowCpr() {
+    const nextVal = !this.narrowCprFilter();
+    this.narrowCprFilter.set(nextVal);
+    if (!nextVal) {
+      this.aboveSmaFilter.set(false);
+    }
+  }
+
   sortBy(col: SortCol) {
     if (this.sortCol() === col) {
       this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
@@ -577,9 +587,9 @@ export class WatchlistComponent {
 
     if (this.narrowCprFilter()) {
       res = res.filter(r => r.narrow_cpr);
-    }
-    if (this.aboveSmaFilter()) {
-      res = res.filter(r => r.close >= r.sma_20);
+      if (this.aboveSmaFilter()) {
+        res = res.filter(r => r.close >= r.sma_20);
+      }
     }
 
     const col = this.sortCol();
