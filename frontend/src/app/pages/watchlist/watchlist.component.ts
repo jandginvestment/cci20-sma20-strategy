@@ -68,25 +68,26 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
             }
           </div>
 
-          <!-- CPR filter row -->
-          <div class="sig-filter-row mb-3">
+          <!-- CPR filter switches -->
+          <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
             <span class="sig-label">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="20" x2="18" y2="10"></line>
                 <line x1="12" y1="20" x2="12" y2="4"></line>
                 <line x1="6" y1="20" x2="6" y2="14"></line>
               </svg>
-              CPR Filter:
+              CPR Filters:
             </span>
-            <button class="sig-chip sig-cpr-all"     [class.active]="cprFilter()==='all'"            (click)="cprFilter.set('all')">All</button>
-            <button class="sig-chip sig-cpr-narrow"  [class.active]="cprFilter()==='narrow'"         (click)="cprFilter.set('narrow')">Narrow CPR Only</button>
-            <button class="sig-chip sig-cpr-bullish" [class.active]="cprFilter()==='bullish_narrow'" (click)="cprFilter.set('bullish_narrow')">Bullish + Narrow</button>
-            @if (cprFilter() !== 'all') {
-              <button class="clear-btn" (click)="cprFilter.set('all')" title="Clear CPR filter">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                     stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              </button>
-            }
+            <div class="form-check form-switch d-inline-flex align-items-center gap-2 m-0 p-0 ps-4">
+              <input class="form-check-input custom-switch m-0" type="checkbox" role="switch" id="narrowCprSwitch"
+                     [checked]="cprFilter()==='narrow'" (change)="toggleCprFilter('narrow')">
+              <label class="form-check-label text-secondary fs-7" for="narrowCprSwitch">Narrow CPR</label>
+            </div>
+            <div class="form-check form-switch d-inline-flex align-items-center gap-2 m-0 p-0 ps-4">
+              <input class="form-check-input custom-switch m-0" type="checkbox" role="switch" id="bullishNarrowSwitch"
+                     [checked]="cprFilter()==='bullish_narrow'" (change)="toggleCprFilter('bullish_narrow')">
+              <label class="form-check-label text-secondary fs-7" for="bullishNarrowSwitch">Bullish + Narrow</label>
+            </div>
           </div>
 
           <!-- 2. Stat cards -->
@@ -450,14 +451,23 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
       border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .sig-chip.sig-cpr-all      { color: #B7C8E1; }
-    .sig-chip.sig-cpr-all:hover, .sig-chip.sig-cpr-all.active { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); color: #FFF; }
-
-    .sig-chip.sig-cpr-narrow   { color: #F59E0B; }
-    .sig-chip.sig-cpr-narrow:hover, .sig-chip.sig-cpr-narrow.active { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.45); }
-
-    .sig-chip.sig-cpr-bullish  { color: #10b981; }
-    .sig-chip.sig-cpr-bullish:hover, .sig-chip.sig-cpr-bullish.active { background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.45); }
+    .custom-switch {
+      cursor: pointer;
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.16);
+      width: 2.25em;
+      height: 1.15em;
+    }
+    .custom-switch:checked {
+      background-color: #F59E0B !important;
+      border-color: #F59E0B !important;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23120f0a'/%3e%3c/svg%3e") !important;
+    }
+    .form-check-label {
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.85rem;
+    }
   `]
 })
 export class WatchlistComponent {
@@ -508,6 +518,10 @@ export class WatchlistComponent {
 
   toggleSig(s: 'reversal' | 'recovery' | 'momentum' | 'overbought') {
     this.sigFilter.set(this.sigFilter() === s ? 'all' : s);
+  }
+
+  toggleCprFilter(f: CprFilter) {
+    this.cprFilter.set(this.cprFilter() === f ? 'all' : f);
   }
 
   sortBy(col: SortCol) {
