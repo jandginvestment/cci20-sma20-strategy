@@ -1,21 +1,35 @@
-<h2 mat-dialog-title class="disclaimer-title">⚠️ Disclaimer</h2>
+<h2 mat-dialog-title class="disclaimer-title">
+  <span class="warning-icon">⚠</span> Compliance Disclaimer
+</h2>
+
 <mat-dialog-content class="disclaimer-content">
   <p>
-    These signals (Reversal Zone, Recovery, Bullish Setup, Overbought) are screening filters that identify stocks by their current CCI(20)/SMA(20) state near key lows. 
+    This trading filter system and all associated information are provided for educational and
+    informational purposes only. The strategies, tools, and indicators provided within the
+    CCI/SMA Amber Terminal do not constitute financial advice, investment recommendations,
+    or an endorsement of any particular trading strategy.
   </p>
   <p>
-    <strong>They are not buy/sell signals.</strong> A complete trading decision requires additional confirmation — an entry trigger, stop-loss, and profit target — which this tool does not currently provide.
+    Trading in financial markets involves significant risk of loss and is not suitable for every
+    investor. You are entirely responsible for evaluating the merits and risks associated with the
+    use of any information provided by this system before making any investment decisions.
   </p>
   <p>
-    Use these filters to narrow your watchlist, then apply your own entry/exit rules and risk management. 
+    Past performance of any trading system or methodology is not necessarily indicative of
+    future results. The developers and providers of this terminal shall not be held liable for any
+    damages, losses, or costs arising out of or in any way connected with your use of this
+    software.
   </p>
-  <p class="educational-text">
-    <em>For educational and informational purposes only; not investment advice.</em>
-  </p>
-  <div class="quote-box">
-    <strong>YOUR MONEY, YOUR RESPONSIBILITY</strong>
+
+  <div class="callout-box">
+    <div class="callout-heading">YOUR MONEY, YOUR<br>RESPONSIBILITY</div>
+    <p class="callout-subtext">
+      Use of this system constitutes acceptance of this disclaimer. Proceed only if you fully comprehend
+      the financial risks involved in active market trading.
+    </p>
   </div>
 </mat-dialog-content>
+
 <mat-dialog-actions align="end">
-  <button mat-flat-button color="accent" (click)="accept()">I Understand & Accept</button>
+  <button mat-flat-button class="accept-btn" (click)="accept()">I UNDERSTAND & ACCEPT</button>
 </mat-dialog-actions>
