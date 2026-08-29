@@ -11,6 +11,7 @@ import { RouterModule } from '@angular/router';
 
 type LowFilter = 'all' | 'yearly' | 'monthly' | 'weekly';
 type SigFilter = 'all' | 'reversal' | 'recovery' | 'momentum' | 'overbought';
+type CprFilter = 'all' | 'narrow' | 'bullish_narrow';
 type SortCol   = 'ticker' | 'signal' | 'close' | 'cci_20' | 'sma_20'
                | 'narrow_cpr' | 'yearly_low_pct' | 'monthly_low_pct' | 'weekly_low_pct';
 type SortDir   = 'asc' | 'desc';
@@ -61,6 +62,27 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
             <button class="sig-chip sig-overbought"[class.active]="sigFilter()==='overbought'"(click)="toggleSig('overbought')">Overbought</button>
             @if (sigFilter() !== 'all') {
               <button class="clear-btn" (click)="sigFilter.set('all')" title="Clear signal filter">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            }
+          </div>
+
+          <!-- CPR filter row -->
+          <div class="sig-filter-row mb-3">
+            <span class="sig-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+              CPR Filter:
+            </span>
+            <button class="sig-chip sig-cpr-all"     [class.active]="cprFilter()==='all'"            (click)="cprFilter.set('all')">All</button>
+            <button class="sig-chip sig-cpr-narrow"  [class.active]="cprFilter()==='narrow'"         (click)="cprFilter.set('narrow')">Narrow CPR Only</button>
+            <button class="sig-chip sig-cpr-bullish" [class.active]="cprFilter()==='bullish_narrow'" (click)="cprFilter.set('bullish_narrow')">Bullish + Narrow</button>
+            @if (cprFilter() !== 'all') {
+              <button class="clear-btn" (click)="cprFilter.set('all')" title="Clear CPR filter">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                      stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
@@ -427,6 +449,15 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
       color: #4a3e30;
       border: 1px solid rgba(255, 255, 255, 0.06);
     }
+
+    .sig-chip.sig-cpr-all      { color: #B7C8E1; }
+    .sig-chip.sig-cpr-all:hover, .sig-chip.sig-cpr-all.active { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); color: #FFF; }
+
+    .sig-chip.sig-cpr-narrow   { color: #F59E0B; }
+    .sig-chip.sig-cpr-narrow:hover, .sig-chip.sig-cpr-narrow.active { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.45); }
+
+    .sig-chip.sig-cpr-bullish  { color: #10b981; }
+    .sig-chip.sig-cpr-bullish:hover, .sig-chip.sig-cpr-bullish.active { background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.45); }
   `]
 })
 export class WatchlistComponent {
@@ -440,6 +471,7 @@ export class WatchlistComponent {
 
   lowFilter = signal<LowFilter>('all');
   sigFilter = signal<SigFilter>('all');
+  cprFilter = signal<CprFilter>('all');
   sortCol   = signal<SortCol>('yearly_low_pct');
   sortDir   = signal<SortDir>('asc');
 
@@ -532,6 +564,13 @@ export class WatchlistComponent {
 
     const sf = this.sigFilter();
     if (sf !== 'all') res = res.filter(r => this.sigType(r) === sf);
+
+    const cf = this.cprFilter();
+    if (cf === 'narrow') {
+      res = res.filter(r => r.narrow_cpr);
+    } else if (cf === 'bullish_narrow') {
+      res = res.filter(r => r.narrow_cpr && r.close >= r.sma_20);
+    }
 
     const col = this.sortCol();
     const dir = this.sortDir() === 'asc' ? 1 : -1;
