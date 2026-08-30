@@ -208,8 +208,13 @@ export class TourComponent {
     },
     {
       sel: 'a[routerLink="/settings"]',
+      title: 'Open Settings',
+      body: 'Click Settings in the sidebar to manage your watchlists. The tour will continue there — or press Next to go directly.'
+    },
+    {
+      sel: '.upload-row',
       title: 'Add Your Watchlist',
-      body: 'Go to Settings to upload a CSV of NSE ticker symbols (e.g. INFY.NS, TCS.NS) and create your own watchlist. The scanner will include it in the next run.'
+      body: 'Enter a watchlist name, choose a CSV file of NSE ticker symbols (one per line, e.g. INFY.NS), then click Upload. The scanner will include it in the next run.'
     },
   ];
 
@@ -244,14 +249,16 @@ export class TourComponent {
   });
 
   nextLabel(): string {
-    return this.svc.step() === 1 ? 'Got it — pick a watchlist →' : 'Next →';
+    if (this.svc.step() === 1) return 'Got it — pick a watchlist →';
+    if (this.svc.step() === 5) return 'Got it — open Settings →';
+    return 'Next →';
   }
 
   next() {
     if (this.isLast()) { this.svc.finish(); return; }
     this.svc.advance();
-    // After step 1 (sidebar) → pause until WatchlistComponent resumes at step 2
-    if (this.svc.step() === 2) this.svc.pause();
+    // Pause at step 2 (needs watchlist page) and step 6 (needs settings page)
+    if (this.svc.step() === 2 || this.svc.step() === 6) this.svc.pause();
   }
 
   skip() { this.svc.finish(); }

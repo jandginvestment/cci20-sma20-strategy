@@ -3,6 +3,7 @@ import { SidebarComponent } from '../../shared/components/sidebar/sidebar.compon
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { WatchlistService, WatchlistMeta } from '../../core/api/watchlist.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { TourService } from '../../core/tour.service';
 import { DatePipe } from '@angular/common';
 
 @Component({
@@ -281,13 +282,20 @@ import { DatePipe } from '@angular/common';
 export class SettingsComponent implements OnInit {
   readonly authService = inject(AuthService);
   private readonly watchlistService = inject(WatchlistService);
+  private readonly tourService = inject(TourService);
 
   watchlists = signal<WatchlistMeta[]>([]);
   deletingWl = signal<string | null>(null);
   fileName   = signal('No file chosen');
   logs       = signal<string[]>(['System settings loaded successfully. Watchlist manager initialized.']);
 
-  ngOnInit() { this.loadWatchlists(); }
+  ngOnInit() {
+    this.loadWatchlists();
+    // Resume guided tour phase 3 (upload step) when landing on settings
+    if (this.tourService.step() === 6 && !this.tourService.active() && !localStorage.getItem('cci_tour_done')) {
+      setTimeout(() => this.tourService.resume(), 500);
+    }
+  }
 
   loadWatchlists() {
     this.watchlistService.getWatchlists().subscribe(list => this.watchlists.set(list));
