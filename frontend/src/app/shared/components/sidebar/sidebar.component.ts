@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { WatchlistService, WatchlistMeta } from '../../../core/api/watchlist.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { TourService } from '../../../core/tour.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DisclaimerDialogComponent } from '../disclaimer-dialog/disclaimer-dialog.component';
 
@@ -103,6 +104,17 @@ import { DisclaimerDialogComponent } from '../disclaimer-dialog/disclaimer-dialo
             <line x1="12" y1="17" x2="12.01" y2="17"></line>
           </svg>
           <span class="nav-label">Disclaimer</span>
+        </a>
+
+        <!-- Take Tour -->
+        <a class="nav-item" (click)="startTour()" style="cursor:pointer" title="Take Tour">
+          <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 16 16 12 12 8"></polyline>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          <span class="nav-label">Take Tour</span>
         </a>
 
         <!-- Help -->
@@ -240,6 +252,7 @@ export class SidebarComponent implements OnInit {
   private readonly watchlistService = inject(WatchlistService);
   public readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
+  private readonly tourService = inject(TourService);
 
   collapsed = signal(false);
   watchlists = signal<WatchlistMeta[]>([]);
@@ -263,5 +276,9 @@ export class SidebarComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+  }
+
+  startTour() {
+    this.tourService.startForced();
   }
 }

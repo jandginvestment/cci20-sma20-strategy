@@ -4,6 +4,7 @@ import { SidebarComponent } from '../../shared/components/sidebar/sidebar.compon
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { WatchlistService, WatchlistMeta } from '../../core/api/watchlist.service';
 import { ScanService } from '../../core/api/scan.service';
+import { TourService } from '../../core/tour.service';
 import { DatePipe } from '@angular/common';
 
 @Component({
@@ -156,6 +157,7 @@ import { DatePipe } from '@angular/common';
 export class DashboardComponent implements OnInit {
   private watchlistService = inject(WatchlistService);
   private scanService = inject(ScanService);
+  private tourService = inject(TourService);
 
   watchlists = signal<WatchlistMeta[]>([]);
   scanning = signal(false);
@@ -170,6 +172,8 @@ export class DashboardComponent implements OnInit {
       this.watchlists.set(list);
     });
     this.checkStatus();
+    // Auto-start guided tour for first-time users
+    setTimeout(() => this.tourService.start(), 800);
   }
 
   triggerScan() {

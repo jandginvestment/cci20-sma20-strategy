@@ -7,6 +7,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { SignalBadgeComponent } from '../../shared/components/signal-badge/signal-badge.component';
 import { SparklineComponent } from '../../shared/components/sparkline/sparkline.component';
 import { WatchlistService, SignalResult } from '../../core/api/watchlist.service';
+import { TourService } from '../../core/tour.service';
 import { RouterModule } from '@angular/router';
 
 type LowFilter = 'all' | 'yearly' | 'monthly' | 'weekly';
@@ -476,6 +477,7 @@ const YR_THR = 10, MO_THR = 5, WK_THR = 2;
 })
 export class WatchlistComponent {
   private readonly svc = inject(WatchlistService);
+  private readonly tourSvc = inject(TourService);
 
   name = input.required<string>();
 
@@ -495,6 +497,11 @@ export class WatchlistComponent {
   readonly WK_THR = WK_THR;
 
   constructor() {
+    // Resume guided tour phase 2 when landing on a watchlist for the first time
+    if (this.tourSvc.step() === 2 && !this.tourSvc.active() && !localStorage.getItem('cci_tour_done')) {
+      setTimeout(() => this.tourSvc.resume(), 500);
+    }
+
     // Fix: react to name() changes so navigating between watchlists reloads data
     toObservable(this.name)
       .pipe(

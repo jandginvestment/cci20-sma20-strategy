@@ -4,12 +4,13 @@ import { RouterOutlet } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DisclaimerDialogComponent } from './shared/components/disclaimer-dialog/disclaimer-dialog.component';
 import { AuthService } from './core/auth/auth.service';
+import { TourComponent } from './shared/components/tour/tour.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  template: `<router-outlet></router-outlet>`,
+  imports: [RouterOutlet, TourComponent],
+  template: `<router-outlet></router-outlet><app-tour></app-tour>`,
   styles: []
 })
 export class AppComponent implements OnInit {
