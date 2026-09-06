@@ -2,10 +2,12 @@
 
 > Automated NSE stock screening dashboard — scans CCI(20) & SMA(20) momentum signals and proximity to weekly, monthly, and yearly price lows. Refreshed twice daily on market days.
 
-[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-GitHub%20Pages-blue?style=for-the-badge&logo=github)](https://jandginvestment.github.io/cci20-sma20-strategy/)
+### [→ Sign Up Free and use it now — no setup needed](https://jandginvestment.github.io/cci20-sma20-strategy/)
+
+[![Sign Up Free](https://img.shields.io/badge/Sign%20Up%20Free-Use%20the%20Live%20App-F59E0B?style=for-the-badge&logo=github)](https://jandginvestment.github.io/cci20-sma20-strategy/)
+[![Scan Schedule](https://img.shields.io/badge/Scan-Mon–Fri%20×%202%2Fday-green?style=for-the-badge&logo=amazoneventbridge)](https://aws.amazon.com/eventbridge/)
 [![API](https://img.shields.io/badge/API-AWS%20Lambda-orange?style=for-the-badge&logo=amazonaws)](https://aws.amazon.com)
 [![DB](https://img.shields.io/badge/Database-Neon%20PostgreSQL-3ECF8E?style=for-the-badge&logo=postgresql)](https://neon.tech)
-[![Scan Schedule](https://img.shields.io/badge/Scan-Mon–Fri%20×%202%2Fday-green?style=for-the-badge&logo=amazoneventbridge)](https://aws.amazon.com/eventbridge/)
 
 ---
 
