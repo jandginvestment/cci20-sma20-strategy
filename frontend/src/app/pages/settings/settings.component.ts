@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, effect } from '@angular/core';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { WatchlistService, WatchlistMeta } from '../../core/api/watchlist.service';
@@ -289,12 +289,18 @@ export class SettingsComponent implements OnInit {
   fileName   = signal('No file chosen');
   logs       = signal<string[]>(['System settings loaded successfully. Watchlist manager initialized.']);
 
+  constructor() {
+    effect(() => {
+      const step   = this.tourService.step();
+      const active = this.tourService.active();
+      if (step === 6 && !active && !localStorage.getItem('cci_tour_done')) {
+        setTimeout(() => this.tourService.resume(), 500);
+      }
+    });
+  }
+
   ngOnInit() {
     this.loadWatchlists();
-    // Resume guided tour phase 3 (upload step) when landing on settings
-    if (this.tourService.step() === 6 && !this.tourService.active() && !localStorage.getItem('cci_tour_done')) {
-      setTimeout(() => this.tourService.resume(), 500);
-    }
   }
 
   loadWatchlists() {

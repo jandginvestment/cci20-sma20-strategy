@@ -1,4 +1,4 @@
-import { Component, input, inject, signal, computed } from '@angular/core';
+import { Component, input, inject, signal, computed, effect } from '@angular/core';
 import { NgClass, DecimalPipe } from '@angular/common';
 import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
@@ -497,10 +497,15 @@ export class WatchlistComponent {
   readonly WK_THR = WK_THR;
 
   constructor() {
-    // Resume guided tour phase 2 when landing on a watchlist for the first time
-    if (this.tourSvc.step() === 2 && !this.tourSvc.active() && !localStorage.getItem('cci_tour_done')) {
-      setTimeout(() => this.tourSvc.resume(), 500);
-    }
+    // Resume guided tour phase 2 reactively — fires whenever step/active change,
+    // so it works even when the component is already mounted (e.g. "Take Tour" from sidebar)
+    effect(() => {
+      const step   = this.tourSvc.step();
+      const active = this.tourSvc.active();
+      if (step === 2 && !active && !localStorage.getItem('cci_tour_done')) {
+        setTimeout(() => this.tourSvc.resume(), 500);
+      }
+    });
 
     // Fix: react to name() changes so navigating between watchlists reloads data
     toObservable(this.name)
