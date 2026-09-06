@@ -293,7 +293,7 @@ export class SettingsComponent implements OnInit {
     effect(() => {
       const step   = this.tourService.step();
       const active = this.tourService.active();
-      if (step === 6 && !active && !localStorage.getItem('cci_tour_done')) {
+      if (step === 2 && !active && !localStorage.getItem('cci_tour_done')) {
         setTimeout(() => this.tourService.resume(), 500);
       }
     });

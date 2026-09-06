@@ -502,7 +502,7 @@ export class WatchlistComponent {
     effect(() => {
       const step   = this.tourSvc.step();
       const active = this.tourSvc.active();
-      if (step === 2 && !active && !localStorage.getItem('cci_tour_done')) {
+      if (step === 4 && !active && !localStorage.getItem('cci_tour_done')) {
         setTimeout(() => this.tourSvc.resume(), 500);
       }
     });

@@ -184,12 +184,22 @@ export class TourComponent {
     {
       sel: null,
       title: 'Welcome to CCI/SMA Scanner',
-      body: 'This app scans NSE stocks using CCI(20) and SMA(20) to spot key technical signals — Reversal Zone, Recovery, Bullish Setup, and Overbought. Let\'s take a quick look around.'
+      body: 'This app scans NSE stocks using CCI(20) and SMA(20) to spot key technical signals — Reversal Zone, Recovery, Bullish Setup, and Overbought. Let\'s set things up first.'
+    },
+    {
+      sel: 'a[routerLink="/settings"]',
+      title: 'Start with Settings',
+      body: 'Before viewing signals, add your watchlist of NSE tickers. Click Settings in the sidebar — the tour will continue there automatically.'
+    },
+    {
+      sel: '.upload-row',
+      title: 'Add Your Watchlist',
+      body: 'Enter a name, choose a CSV of NSE symbols (one per line, e.g. INFY, RELIANCE), then click Upload. The scanner runs nightly and populates signals for every ticker.'
     },
     {
       sel: '.sidebar-nav',
       title: 'Your Watchlists',
-      body: 'The sidebar lists your custom watchlists. Click any watchlist name to load its stocks and their signals. Click a watchlist now to continue the tour on that page.'
+      body: 'After uploading, your watchlist appears here in the sidebar. Click it to load the stock signals. Click a watchlist now to continue the tour on that page.'
     },
     {
       sel: '.sig-filter-row',
@@ -205,16 +215,6 @@ export class TourComponent {
       sel: '.scanner-table',
       title: 'The Table',
       body: 'Each row shows the closing price, CCI(20) sparkline with value, SMA direction arrow, and the 1-Yr / 1-Mo / 1-Wk low prices with a distance bar and percentage.'
-    },
-    {
-      sel: 'a[routerLink="/settings"]',
-      title: 'Open Settings',
-      body: 'Click Settings in the sidebar to manage your watchlists. The tour will continue there — or press Next to go directly.'
-    },
-    {
-      sel: '.upload-row',
-      title: 'Add Your Watchlist',
-      body: 'Enter a watchlist name, choose a CSV file of NSE ticker symbols (one per line, e.g. INFY.NS), then click Upload. The scanner will include it in the next run.'
     },
   ];
 
@@ -249,16 +249,16 @@ export class TourComponent {
   });
 
   nextLabel(): string {
-    if (this.svc.step() === 1) return 'Got it — pick a watchlist →';
-    if (this.svc.step() === 5) return 'Got it — open Settings →';
+    if (this.svc.step() === 1) return 'Got it — open Settings →';
+    if (this.svc.step() === 3) return 'Got it — pick a watchlist →';
     return 'Next →';
   }
 
   next() {
     if (this.isLast()) { this.svc.finish(); return; }
     this.svc.advance();
-    // Pause at step 2 (needs watchlist page) and step 6 (needs settings page)
-    if (this.svc.step() === 2 || this.svc.step() === 6) this.svc.pause();
+    // Pause at step 2 (needs settings page) and step 4 (needs watchlist page)
+    if (this.svc.step() === 2 || this.svc.step() === 4) this.svc.pause();
   }
 
   skip() { this.svc.finish(); }
