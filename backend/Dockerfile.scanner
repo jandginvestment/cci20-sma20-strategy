@@ -1,14 +1,18 @@
-# ── AWS Lambda Scanner — Container Image ───────────────────────────────────────
-# Uses the official AWS Lambda Python 3.11 base image.
-# No 250 MB unzipped limit — supports up to 10 GB.
+# ── AWS Lambda Scanner — Lightweight Container Image ───────────────────────────
+FROM public.ecr.aws/lambda/python:3.11 AS builder
+
+COPY scanner_requirements.txt .
+RUN pip install --no-cache-dir --target /install -r scanner_requirements.txt
+
+# ── Final image — only runtime files ──────────────────────────────────────────
 FROM public.ecr.aws/lambda/python:3.11
 
-# Install scanner-specific heavy dependencies
-COPY scanner_requirements.txt .
-RUN pip install --no-cache-dir -r scanner_requirements.txt
+# Copy installed packages
+COPY --from=builder /install ${LAMBDA_TASK_ROOT}
 
-# Copy entire backend source (scanner.py, scanner_lambda.py, db/, watchlists/, etc.)
-COPY . ${LAMBDA_TASK_ROOT}
+# Copy only scanner source (exclude venv, node_modules, __pycache__, watchlist CSVs not needed at image time)
+COPY scanner.py scanner_lambda.py ${LAMBDA_TASK_ROOT}/
+COPY db/ ${LAMBDA_TASK_ROOT}/db/
+COPY watchlists/ ${LAMBDA_TASK_ROOT}/watchlists/
 
-# Lambda handler entrypoint
 CMD ["scanner_lambda.handler"]

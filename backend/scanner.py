@@ -18,7 +18,6 @@ import sys
 import numpy as np
 import pandas as pd
 import yfinance as yf
-from tqdm import tqdm
 
 _here = os.path.dirname(os.path.abspath(__file__))
 if _here not in sys.path:
@@ -249,7 +248,7 @@ def run_scanner(watchlists_dir: str, user_id=None):
     today = datetime.date.today()
     saved_count = 0
 
-    for ticker in tqdm(all_tickers):
+    for ticker in all_tickers:
         metrics = scan_single_ticker(ticker)
         if not metrics:
             continue
