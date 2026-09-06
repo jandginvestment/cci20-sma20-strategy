@@ -152,7 +152,7 @@ def scan_single_ticker(ticker_symbol: str) -> dict | None:
         
         df = yf.download(
             ticker_symbol, start=start_date, end=end_date,
-            interval="1d", progress=False
+            interval="1d", progress=False, auto_adjust=True
         )
 
         if isinstance(df.columns, pd.MultiIndex):
