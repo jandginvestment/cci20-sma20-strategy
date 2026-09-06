@@ -1,7 +1,7 @@
 # ── Scanner Lambda — heavy deps (no boto3 — pre-installed in Lambda runtime) ───
 pandas==2.2.2
 numpy==1.26.4
-yfinance==0.2.40
+yfinance>=0.2.61
 tqdm
 greenlet==3.0.3
 sqlalchemy>=2.0.0
