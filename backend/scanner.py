@@ -143,12 +143,20 @@ def sync_default_watchlists(watchlists_dir: str, session: Session, admin_user: U
 
 # ── Centralized Single-Pass Scanner ─────────────────────────────────────────────
 
-def scan_single_ticker(ticker_symbol: str) -> dict | None:
-    """Download OHLCV (~380 calendar days / ~260 trading days) and compute CCI(20) & SMA(20)."""
+_DELISTED = False   # sentinel: download succeeded but returned no data → remove ticker
+
+def scan_single_ticker(ticker_symbol: str):
+    """Download OHLCV (~380 calendar days / ~260 trading days) and compute CCI(20) & SMA(20).
+
+    Returns:
+        dict   — success
+        None   — transient failure (network/timeout); keep ticker
+        False  — ticker is delisted / invalid; caller should remove it
+    """
     try:
         end_date   = datetime.date.today() + datetime.timedelta(days=1)
         start_date = end_date - datetime.timedelta(days=380)
-        
+
         df = yf.download(
             ticker_symbol, start=start_date, end=end_date,
             interval="1d", progress=False, auto_adjust=True
@@ -157,9 +165,13 @@ def scan_single_ticker(ticker_symbol: str) -> dict | None:
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.droplevel(1)
 
-        if df.empty or len(df) < 252:
+        if df.empty:
+            print(f"  DELISTED {ticker_symbol}: empty response")
+            return _DELISTED          # remove from watchlist
+
+        if len(df) < 252:
             print(f"  SKIP {ticker_symbol}: rows={len(df)}")
-            return None
+            return None               # keep — new listing or insufficient history
 
         df["SMA_20"]    = df["Close"].rolling(window=20).mean()
         typical_price   = (df["High"] + df["Low"] + df["Close"]) / 3
@@ -226,7 +238,7 @@ def scan_single_ticker(ticker_symbol: str) -> dict | None:
 
     except Exception as exc:
         print(f"  ERROR {ticker_symbol}: {exc}")
-        return None
+        return None   # transient — keep ticker
 
 
 def run_scanner(watchlists_dir: str, user_id=None):
@@ -248,9 +260,26 @@ def run_scanner(watchlists_dir: str, user_id=None):
     today = datetime.date.today()
     saved_count = 0
 
+    removed_count = 0
+
     for ticker in all_tickers:
         metrics = scan_single_ticker(ticker)
-        if not metrics:
+
+        if metrics is False:
+            # Ticker returned empty data → delisted/invalid; purge from all watchlists
+            try:
+                session.execute(
+                    WatchlistItem.__table__.delete().where(WatchlistItem.ticker == ticker)
+                )
+                session.commit()
+                removed_count += 1
+                print(f"  REMOVED {ticker} from all watchlists (delisted)")
+            except Exception as exc:
+                print(f"  DB Error removing {ticker}: {exc}")
+                session.rollback()
+            continue
+
+        if metrics is None:
             continue
 
         # Check if record for today already exists
@@ -309,7 +338,7 @@ def run_scanner(watchlists_dir: str, user_id=None):
             session.rollback()
 
     session.close()
-    print(f"\n[OK] Centralized scan complete. Saved metrics for {saved_count} unique tickers.")
+    print(f"\n[OK] Centralized scan complete. Saved: {saved_count} tickers. Removed (delisted): {removed_count}.")
 
 
 # ── CLI entry point ─────────────────────────────────────────────────────────────
